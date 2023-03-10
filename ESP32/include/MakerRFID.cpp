@@ -1,0 +1,199 @@
+#include "MakerRFID.hpp"
+
+MakerRFID::MakerRFID() {
+  rfid_ = MFRC522(SS_PIN, RST_PIN);
+}
+
+Adafruit_SSD1306 MakerRFID::GetDisplay() {
+  return display_;
+}
+
+
+MFRC522 MakerRFID::GetRFID() {
+  return rfid_;
+}
+
+
+void MakerRFID::SetWiFi(char* ssid, char* password) {
+  ssid_ = ssid;
+  password_ = password;
+}
+
+void MakerRFID::StartWiFi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid_, password_); //Establece la conexión
+
+  Serial.print("Connecting to WiFi ..");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print('.');
+    delay(1000);
+  }
+
+  Serial.println(WiFi.localIP());
+  Serial.print("RRSI: ");
+  Serial.println(WiFi.RSSI());
+}
+
+void MakerRFID::EndWiFi() {
+
+}
+
+void MakerRFID::StartSerial(int baudrate) {
+  Serial.begin(baudrate);
+}
+
+void MakerRFID::StartSPI() {
+  SPI.begin();
+}
+
+void MakerRFID::StartRFID() {
+  rfid_.PCD_Init();
+}
+
+void MakerRFID::StopRFID() {
+  rfid_.PICC_HaltA(); // Halt PICC
+  rfid_.PCD_StopCrypto1();  // Stop encryption on PCD
+}
+
+void MakerRFID::AuthenticateCard(int keytype) {
+  // Type 0: Key A
+  // Type 1: Key B
+  int trailerBlock = 3;
+  if (keytype == 0) {
+    status_ = (MFRC522::StatusCode) rfid_.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerBlock, &key_, &(rfid_.uid));
+    if (status_ != MFRC522::STATUS_OK) {
+      Serial.print(F("PCD_Authenticate() failed: "));
+      Serial.println(rfid_.GetStatusCodeName(status_));
+    }
+  } else if (keytype == 1) {
+    status_ = (MFRC522::StatusCode) rfid_.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_B, trailerBlock, &key_, &(rfid_.uid));
+    if (status_ != MFRC522::STATUS_OK) {
+      Serial.print(F("PCD_Authenticate() failed: "));
+      Serial.println(rfid_.GetStatusCodeName(status_));
+    }
+  }
+}
+
+void MakerRFID::StartDisplay() {
+  if (!display_.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+  }
+}
+
+void MakerRFID::ShowLogos(int delay_time) {
+  display_.clearDisplay();
+  display_.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
+  display_.display();
+  delay(delay_time); // Pause for 2.5 seconds
+  display_.clearDisplay();
+  display_.drawBitmap(0, 0, logoULL, 120, 32, 1);
+  display_.display();
+  delay(delay_time); // Pause for 2.5 seconds
+  display_.clearDisplay();
+}
+
+void MakerRFID::DetectCard() {
+  while (!rfid_.PICC_IsNewCardPresent()) {
+    //Serial.println("No se detecta tarjeta");
+    digitalWrite(greenPin, LOW);
+    digitalWrite(redPin, LOW);
+    display_.clearDisplay();
+    display_.setCursor(0, 0);
+    display_.setTextColor(WHITE);
+    display_.setTextSize(2);
+    display_.println("Acerca la");
+    display_.print("tarjeta");
+    display_.display();
+    delay(1000);
+  } 
+
+  while (!rfid_.PICC_ReadCardSerial()) {}
+
+}
+
+void MakerRFID::ReadingMessage() {
+  display_.clearDisplay();
+  display_.setCursor(0, 0);
+  display_.setTextColor(WHITE);
+  display_.setTextSize(2);
+  display_.print("Leyendo...");
+  display_.display();
+  Serial.println("Tarjeta detectada");
+}
+
+void MakerRFID::PrintCardDetails() {
+  Serial.println("Detalles: ");
+  rfid_.PICC_DumpDetailsToSerial(&(rfid_.uid));
+}
+
+void MakerRFID::SetKey(byte newkey[]) {
+  for (byte i = 0; i < 6; i++) { 
+    key_.keyByte[i] = newkey[i];
+  }
+}
+
+void MakerRFID::DumpByteArray(byte *buffer, byte bufferSize) {
+  for (byte i = 0; i < bufferSize; i++) {
+    Serial.println(buffer[i] < 0x10 ? " 0" : " ");
+    Serial.println(buffer[i], HEX);
+  }
+}
+
+void MakerRFID::ReadSector(byte* buffer, int sector) {
+  int blockAddr = sector;
+  byte size = sizeof(buffer);
+  status_ = (MFRC522::StatusCode) rfid_.MIFARE_Read(blockAddr, buffer, &size);
+  if (status_ != MFRC522::STATUS_OK) {
+    Serial.print(F("MIFARE_Read() failed: "));
+    Serial.println(rfid_.GetStatusCodeName(status_));
+  }
+  Serial.print(F("Data in block ")); 
+  Serial.print(blockAddr); 
+  Serial.println(F(":"));
+  DumpByteArray(buffer, 16); 
+  Serial.println();
+}
+
+void MakerRFID::ReadSectors(byte* buffer, int start, int finish) {
+  //TODO: Incluir lectura en buffer de varios sectores
+  byte size = sizeof(buffer);
+  for (int i = start; i <= finish; i++) {
+    int blockAddr = i;
+    status_ = (MFRC522::StatusCode) rfid_.MIFARE_Read(blockAddr, buffer, &size);
+    if (status_ != MFRC522::STATUS_OK) {
+      Serial.print(F("MIFARE_Read() failed: "));
+      Serial.println(rfid_.GetStatusCodeName(status_));
+    }
+    Serial.print(F("Data in block ")); 
+    Serial.print(blockAddr); 
+    Serial.println(F(":"));
+    DumpByteArray(buffer, 16); 
+    Serial.println();
+  }
+}
+
+void MakerRFID::ReadAllSectors(byte* buffer, int max_sectors) {
+  this->ReadSectors(buffer, 0, 16);
+}
+
+void MakerRFID::PermissionMessage(bool has_permission) {
+  if (has_permission) {
+    display_.clearDisplay();
+    display_.setCursor(0, 0);
+    display_.setTextColor(WHITE);
+    display_.setTextSize(2);
+    display_.print("Permiso concedido!");
+    display_.display();
+    digitalWrite(relayPin, HIGH);
+    delay(5000);
+    digitalWrite(relayPin, LOW);
+
+  } else {
+    display_.clearDisplay();
+    display_.setCursor(0, 0);
+    display_.setTextColor(WHITE);
+    display_.setTextSize(2);
+    display_.print("Denegado :(");
+    display_.display();
+  }
+}
