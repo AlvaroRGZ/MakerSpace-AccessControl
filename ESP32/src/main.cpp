@@ -2,14 +2,6 @@
 // ESP32 Debugger
 #include "MakerRFID.hpp"
 
-//String serverName = "http://127.0.0.1/getdata.php";
-
-MFRC522::MIFARE_Key key;
-MFRC522::StatusCode status;
-MFRC522 mfrc522(SS_PIN, RST_PIN);
-
-
-
 MakerRFID makerspace;
 byte default_key[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 byte alternative_key[6] = {0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E};
@@ -37,7 +29,7 @@ void setup() {
     // Conectar con teclado
 }
 
-void loop(){
+void loop() {
   
   // makerspace.waitForKeyboard();
   // makerspace.displayRequest();
@@ -52,13 +44,15 @@ void loop(){
   makerspace.AuthenticateCard();
 
   makerspace.ReadSector(buffer, 2);
+
+  makerspace.readLockerFromKeyboard();
   
   // Llamada al server con los datos de la tarjeta
   if (!makerspace.compareData(buffer) == "") {
-    makerspace.displayConfirmation();
+    makerspace.PermissionMessage(true);
     makerspace.openLocker();
   } else {
-    makerspace.displayCancelation();
+    makerspace.PermissionMessage(false);
   }
   
   makerspace.StopRFID();
