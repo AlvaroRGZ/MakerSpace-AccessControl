@@ -13,13 +13,14 @@ MFRC522 MakerRFID::GetRFID() {
   return rfid_;
 }
 
-
+/*
 void MakerRFID::SetWiFi(char* ssid, char* password) {
   ssid_ = ssid;
   password_ = password;
 }
+*/
 
-void MakerRFID::StartWiFi() {
+void MakerRFID::StartWiFi(char* ssid, char* password) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid_, password_); //Establece la conexión
 
@@ -196,4 +197,24 @@ void MakerRFID::PermissionMessage(bool has_permission) {
     display_.print("Denegado :(");
     display_.display();
   }
+}
+
+// Comunication with server
+std::string MakerRFID::compareData(char* buffer) {
+  std::string serverName = "http://127.0.0.1/getdata.php?";
+  std::string user = "user=" + std::string(buffer);
+  std::string locker = "locker=" + std::to_string(locker_);
+  std::string request = serverName + user + locker;
+
+  std::string output;
+  HTTPClient http;
+  http.begin(request);
+  int httpCode = http.GET();
+  if(httpCode > 0 && http.getString()){
+    output = http.getString();
+  } else {
+    display.println("[ERROR] Server request failed. Aborting...");
+  }
+  // Si no se recibe nada devuelve una cadena vacia
+  return output;
 }

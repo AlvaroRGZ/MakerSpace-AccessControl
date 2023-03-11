@@ -1,7 +1,8 @@
-#ifndef MAKERRFID_HPP
-#define MAKERRFID_HPP
+#ifndef __MAKERRFID_HPP__
+#define __MAKERRFID_HPP__
 
 #include <Arduino.h>
+#include <string>
 #include <WiFi.h>
 #include <SPI.h>
 #include <MFRC522.h>
@@ -33,8 +34,8 @@ class MakerRFID {
     Adafruit_SSD1306 GetDisplay();
     MFRC522 GetRFID();
 
-    void SetWiFi(char*, char*);
-    void StartWiFi();
+    // void SetWiFi(char*, char*);
+    void StartWiFi(char* ssid, char* password);
     void EndWiFi();
 
     void StartSerial(int = 9600);
@@ -59,13 +60,17 @@ class MakerRFID {
 
     void PermissionMessage(bool);
 
+    // Comunication with server
+    std::string compareData(char* buffer);
+
   private:
-    Adafruit_SSD1306 display_;
-    MFRC522 rfid_;
-    char* ssid_;
-    char* password_;
+    Adafruit_SSD1306 display_; // Conexion con pantalla https://github.com/adafruit/Adafruit_SSD1306
+    MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
+    // char* ssid_;
+    // char* password_;
     MFRC522::MIFARE_Key key_;
     MFRC522::StatusCode status_;
+    int locker_;
 };
 
 #endif

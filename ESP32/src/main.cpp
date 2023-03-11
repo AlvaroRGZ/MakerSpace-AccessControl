@@ -31,12 +31,16 @@ void setup() {
 
     makerspace.StartSerial();
     makerspace.StartSPI();
-    makerspace.SetWiFi(ssid, password);
-    makerspace.StartWiFi();
+    // makerspace.SetWiFi(ssid, password);
+    makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(alternative_key);
+    // Conectar con teclado
 }
 
 void loop(){
+  
+  // makerspace.waitForKeyboard();
+  // makerspace.displayRequest();
   makerspace.DetectCard();
   makerspace.ReadingMessage();
   digitalWrite(greenPin, HIGH);
@@ -46,6 +50,14 @@ void loop(){
   makerspace.AuthenticateCard();
 
   makerspace.ReadSector(buffer, 2);
-
+  /*
+  Llamada al server con los datos de la tarjeta
+  if (!makerspace.compareData(buffer) == "") {
+    makerspace.displayConfirmation();
+    makerspace.openLocker();
+  } else {
+    makerspace.displayCancelation();
+  }
+  */
   makerspace.StopRFID();
 }
