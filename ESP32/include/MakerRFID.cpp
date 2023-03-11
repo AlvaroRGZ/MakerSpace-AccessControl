@@ -216,11 +216,17 @@ void MakerRFID::PermissionMessage(bool has_permission) {
 }
 
 // Comunication with server
+// send uid, password and locker to server for it to check if valid.
 std::string MakerRFID::compareData(char* buffer) {
   std::string serverName = "http://127.0.0.1/getdata.php?";
-  std::string user = "user=" + std::string(buffer);
+  std::string uidString = "";
+  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
+    uidString += String(rfid_.uid.uidByte[i]);
+  }
+  std::string user = "user=" + uidString;
+  std::string password = "pass=" + std::to_string(buffer);
   std::string locker = "locker=" + std::to_string(locker_);
-  std::string request = serverName + user + locker;
+  std::string request = serverName + user + "&" + password + "&" + locker;
 
   std::string output;
   HTTPClient http;
