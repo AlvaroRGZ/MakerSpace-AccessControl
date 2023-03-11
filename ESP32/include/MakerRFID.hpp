@@ -31,38 +31,44 @@ class MakerRFID {
   public:
     MakerRFID();
 
+    // ####### GETTERS #######
     Adafruit_SSD1306 GetDisplay();
     MFRC522 GetRFID();
 
-    // void SetWiFi(char*, char*);
+    // ####### SET UP #######
     void StartWiFi(char* ssid, char* password);
-    void EndWiFi();
-
+    // void SetWiFi(char*, char*);
     void StartSerial(int = 9600);
     void StartSPI();
+    void SetKey(byte[]);
+    // void EndWiFi(); // no hace nada
+    void StartDisplay();
+    void ShowLogos(int = 2500);
 
 
+    // ####### Read card data #######
     void StartRFID();
     void StopRFID();
-    void SetKey(byte[]);
     void AuthenticateCard(int = 0);
+    bool validateCard();
     void DetectCard();
-    void ReadingMessage();
-    void PrintCardDetails();
     void ReadSector(byte*, int);
     void ReadSectors(byte*, int, int);
     void ReadAllSectors(byte*, int = 16);
 
-    void StartDisplay();
-    void ShowLogos(int = 2500);
-
+    // ####### Write data on card #######
     void DumpByteArray(byte *buffer, byte bufferSize);
-
-    void PermissionMessage(bool);
 
     // Comunication with server
     std::string compareData(char* buffer);
 
+    // ####### Display information #######
+    void ReadingMessage();
+    void PrintCardDetails();
+  
+    // ####### Relés #######
+    void PermissionMessage(bool);
+    
   private:
     Adafruit_SSD1306 display_; // Conexion con pantalla https://github.com/adafruit/Adafruit_SSD1306
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid

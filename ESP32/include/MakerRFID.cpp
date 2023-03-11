@@ -75,9 +75,23 @@ void MakerRFID::AuthenticateCard(int keytype) {
   }
 }
 
+// Comprueba que la tarjeta leida sea compatible con el sistema
+bool MakerRFID::validateCard(void) {
+  MFRC522::PICC_Type piccType = rfid_.PICC_GetType(rfid_.uid.sak); //Obtiene el tipo de tarjeta
+  if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI
+    &&  piccType != MFRC522::PICC_TYPE_MIFARE_1K
+    &&  piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
+    // Serial.println(F("Tarjeta no compatible :("));
+    return false;
+  }
+  // Serial.println("Tarjeta compatible con el sistema");
+  return true;
+}
+
 void MakerRFID::StartDisplay() {
   if (!display_.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever | estaa en la version antigua
   }
 }
 
@@ -177,6 +191,8 @@ void MakerRFID::ReadAllSectors(byte* buffer, int max_sectors) {
   this->ReadSectors(buffer, 0, 16);
 }
 
+// Muestra la informacion por el display y acciona el relé
+// Deberiamos poder determinar que rele abrir
 void MakerRFID::PermissionMessage(bool has_permission) {
   if (has_permission) {
     display_.clearDisplay();

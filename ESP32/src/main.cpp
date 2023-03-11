@@ -47,17 +47,19 @@ void loop(){
   digitalWrite(redPin, HIGH);
   makerspace.PrintCardDetails();
 
+  makerspace.validateCard();
+
   makerspace.AuthenticateCard();
 
   makerspace.ReadSector(buffer, 2);
-  /*
-  Llamada al server con los datos de la tarjeta
+  
+  // Llamada al server con los datos de la tarjeta
   if (!makerspace.compareData(buffer) == "") {
     makerspace.displayConfirmation();
     makerspace.openLocker();
   } else {
     makerspace.displayCancelation();
   }
-  */
+  
   makerspace.StopRFID();
 }
