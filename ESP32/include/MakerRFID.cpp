@@ -199,7 +199,7 @@ void MakerRFID::PermissionMessage(bool has_permission) {
     display_.setCursor(0, 0);
     display_.setTextColor(WHITE);
     display_.setTextSize(2);
-    display_.print("Permiso concedido!");
+    display_.print("Permiso concedido.");
     display_.display();
     digitalWrite(relayPin, HIGH);
     delay(5000);
@@ -210,7 +210,7 @@ void MakerRFID::PermissionMessage(bool has_permission) {
     display_.setCursor(0, 0);
     display_.setTextColor(WHITE);
     display_.setTextSize(2);
-    display_.print("Denegado :(");
+    display_.print("Permisos insuficientes.");
     display_.display();
   }
 }
@@ -239,4 +239,41 @@ std::string MakerRFID::compareData(char* buffer) {
   }
   // Si no se recibe nada devuelve una cadena vacia
   return output;
+}
+
+void MakerRFID::openLocker() {
+  /*
+    switch (locker_) { 
+      case 0:
+        digitalWrite(LOCKER_0_PIN);
+        break;
+      case 1:
+        digitalWrite(LOCKER_1_PIN);
+        break;
+      case 2:
+        digitalWrite(LOCKER_2_PIN);
+        break;
+      case 3:
+        digitalWrite(LOCKER_3_PIN);
+        break;
+      (...)
+    }
+  */
+}
+
+void readLockerFromKeyboard() {
+  // display "please enter locker number on keyboard"
+
+
+  // while (!keyboard hasnt received input)
+
+  // assuming each binary number is equal to a digit number of the keyboard
+  // then at least four pins are needed for the 10 values: 0 1 2 3 ... 9
+  // uint8_t pin1 = digitalRead(KEYBOARD_PIN_1);
+  // uint8_t pin2 = digitalRead(KEYBOARD_PIN_2);
+  // uint8_t pin3 = digitalRead(KEYBOARD_PIN_3);
+  // uint8_t pin4 = digitalRead(KEYBOARD_PIN_4);
+
+  // binary pin1, pin2, pin3, ping4 to <uint8_t equivalent>
+  // locker_ = <uint8_t equivalent>
 }

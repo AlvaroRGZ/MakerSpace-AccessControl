@@ -65,9 +65,11 @@ class MakerRFID {
     // ####### Display information #######
     void ReadingMessage();
     void PrintCardDetails();
-  
+
     // ####### Relés #######
     void PermissionMessage(bool);
+    void readLockerFromKeyboard();
+    void openLocker();
     
   private:
     Adafruit_SSD1306 display_; // Conexion con pantalla https://github.com/adafruit/Adafruit_SSD1306
