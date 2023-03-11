@@ -1,5 +1,6 @@
 PRINCIPAL:
-
+  - Conectar el teclado?
+  - Probar conexion con server
 
 SECUNDARIO:
 - Refactorizar el código de los display, hacer que reciba la matriz
