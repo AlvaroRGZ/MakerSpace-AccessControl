@@ -78,7 +78,7 @@ class MakerRFID {
     // char* password_;
     MFRC522::MIFARE_Key key_;
     MFRC522::StatusCode status_;
-    int locker_;
+    uint8_t locker_;
 };
 
 #endif

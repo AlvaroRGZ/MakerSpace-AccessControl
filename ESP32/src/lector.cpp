@@ -11,6 +11,9 @@
 #include <HTTPClient.h>
 #include "logos.h"
 
+// TODO: Set dependency. Import the library
+#include <Keypad.h>
+
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
@@ -26,6 +29,17 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define redPin          32
 #define relayPin        33
 
+// Temporal pins, to be checked with the electronic team
+// after arduino assembly
+#define KEYBOARD_R1_PIN 9
+#define KEYBOARD_R2_PIN 8
+#define KEYBOARD_R3_PIN 7
+#define KEYBOARD_R4_PIN 6
+#define KEYBOARD_C1_PIN 5
+#define KEYBOARD_C2_PIN 4
+#define KEYBOARD_C3_PIN 3
+#define KEYBOARD_C4_PIN 2
+
 String PERM = "ARM1";
 
 const char* ssid = "SSID RASPBERRY";
@@ -37,6 +51,21 @@ MFRC522::MIFARE_Key key;
 MFRC522::StatusCode status;
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
+// setup keypad
+const byte ROWS = 4; 
+const byte COLS = 4; 
+char hexaKeys[ROWS][COLS] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+byte rowPins[ROWS] = {KEYBOARD_R1_PIN, KEYBOARD_R2_PIN, KEYBOARD_R3_PIN,
+    KEYBOARD_R4_PIN};
+byte colPins[COLS] = {KEYBOARD_C1_PIN, KEYBOARD_C2_PIN, KEYBOARD_C3_PIN,
+    KEYBOARD_C4_PIN}; 
+Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
+
 void dump_byte_array(byte *buffer, byte bufferSize, String resultado) {
   for (byte i = 0; i < bufferSize; i++) {
     Serial.println(buffer[i] < 0x10 ? " 0" : " ");
@@ -44,7 +73,6 @@ void dump_byte_array(byte *buffer, byte bufferSize, String resultado) {
     resultado += String(buffer[i]);
   }
 }
-
 
 void setup() {
   serverName += "perm=" + PERM;
@@ -84,6 +112,8 @@ void setup() {
   //Serial.println(WiFi.localIP());
   //Serial.print("RRSI: ");
   //Serial.println(WiFi.RSSI());
+
+  // setup keypad
 
   mfrc522.PCD_Init();
 }
@@ -169,7 +199,12 @@ void loop() {
 
   String uid = "";
   dump_byte_array(buffer, 4, uid);
-  serverName += "uid=" + uid;
+  serverName += "&uid=" + uid;
+
+  String locker = "";
+  char pressedKey = keypad.waitForKey();
+  locker = String(pressedKey);
+  serverName += "&locker=" + locker;
 
   HTTPClient http;
   http.begin(serverName);
