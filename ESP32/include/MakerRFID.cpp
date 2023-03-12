@@ -264,16 +264,12 @@ void MakerRFID::openLocker() {
 void readLockerFromKeyboard() {
   // display "please enter locker number on keyboard"
 
+  // using Keypad.h arduino library
+  // https://github.com/Chris--A/Keypad
 
-  // while (!keyboard hasnt received input)
+  // add keypad_ as private field?
 
-  // assuming each binary number is equal to a digit number of the keyboard
-  // then at least four pins are needed for the 10 values: 0 1 2 3 ... 9
-  // uint8_t pin1 = digitalRead(KEYBOARD_PIN_1);
-  // uint8_t pin2 = digitalRead(KEYBOARD_PIN_2);
-  // uint8_t pin3 = digitalRead(KEYBOARD_PIN_3);
-  // uint8_t pin4 = digitalRead(KEYBOARD_PIN_4);
-
-  // binary pin1, pin2, pin3, ping4 to <uint8_t equivalent>
-  // locker_ = <uint8_t equivalent>
+  // uint8_t locker = 0;
+  // char pressedKey = keypad_.waitForKey();
+  // locker = uint8_t(pressedKey);
 }
