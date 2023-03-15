@@ -60,7 +60,7 @@ class MakerRFID {
     void DumpByteArray(byte *buffer, byte bufferSize);
 
     // Comunication with server
-    std::string compareData(char* buffer);
+    String compareData(byte* buffer);
 
     // ####### Display information #######
     void ReadingMessage();

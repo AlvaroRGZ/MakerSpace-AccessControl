@@ -8,8 +8,8 @@ byte alternative_key[6] = {0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E};
 byte buffer[34];
 
 void setup() {
-    char* ssid = "A";
-    char* password = ";";
+    char* ssid = (char*)'A';
+    char* password = (char*)';';
 
     makerspace.StartDisplay();
     makerspace.ShowLogos();
@@ -48,7 +48,7 @@ void loop() {
   makerspace.readLockerFromKeyboard();
   
   // Llamada al server con los datos de la tarjeta
-  if (!makerspace.compareData(buffer) == "") {
+  if (makerspace.compareData(buffer) != "") {
     makerspace.PermissionMessage(true);
     makerspace.openLocker();
   } else {

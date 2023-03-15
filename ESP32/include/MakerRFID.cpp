@@ -22,7 +22,7 @@ void MakerRFID::SetWiFi(char* ssid, char* password) {
 
 void MakerRFID::StartWiFi(char* ssid, char* password) {
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid_, password_); //Establece la conexión
+  WiFi.begin(ssid, password); //Establece la conexión
 
   Serial.print("Connecting to WiFi ..");
   while (WiFi.status() != WL_CONNECTED) {
@@ -33,10 +33,6 @@ void MakerRFID::StartWiFi(char* ssid, char* password) {
   Serial.println(WiFi.localIP());
   Serial.print("RRSI: ");
   Serial.println(WiFi.RSSI());
-}
-
-void MakerRFID::EndWiFi() {
-
 }
 
 void MakerRFID::StartSerial(int baudrate) {
@@ -217,25 +213,28 @@ void MakerRFID::PermissionMessage(bool has_permission) {
 
 // Comunication with server
 // send uid, password and locker to server for it to check if valid.
-std::string MakerRFID::compareData(char* buffer) {
-  std::string serverName = "http://127.0.0.1/getdata.php?";
-  std::string uidString = "";
+String MakerRFID::compareData(byte* buffer) {
+  String serverName = "http://127.0.0.1/getdata.php?";
+  String uidString = "";
   for (uint8_t i = 0; i < rfid_.uid.size; i++) {
     uidString += String(rfid_.uid.uidByte[i]);
   }
-  std::string user = "user=" + uidString;
-  std::string password = "pass=" + std::to_string(buffer);
-  std::string locker = "locker=" + std::to_string(locker_);
-  std::string request = serverName + user + "&" + password + "&" + locker;
+  String user = "user=" + uidString;
+  String password = "pass=";
+  for (uint8_t i = 0; i < sizeof(buffer); i++) {
+    password += String(buffer[i]);
+  }
+  String locker = "locker=" + String(locker_);
+  String request = serverName + user + "&" + password + "&" + locker;
 
-  std::string output;
+  String output;
   HTTPClient http;
   http.begin(request);
   int httpCode = http.GET();
   if(httpCode > 0 && http.getString()){
     output = http.getString();
   } else {
-    display.println("[ERROR] Server request failed. Aborting...");
+    display_.println("[ERROR] Server request failed. Aborting...");
   }
   // Si no se recibe nada devuelve una cadena vacia
   return output;
