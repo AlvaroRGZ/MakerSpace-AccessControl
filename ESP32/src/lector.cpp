@@ -11,7 +11,6 @@
 #include <HTTPClient.h>
 #include "logos.h"
 
-// TODO: Set dependency. Import the library
 #include <Keypad.h>
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
