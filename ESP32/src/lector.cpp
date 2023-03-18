@@ -5,20 +5,12 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <HTTPClient.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <HTTPClient.h>
 #include "logos.h"
-
+#include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 32 // OLED display height, in pixels
-
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-Adafruit_SSD1306 displayReader(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#define SCREEN_ADDRESS 0x3F ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+LiquidCrystal_I2C display(SCREEN_ADDRESS);
 
 #define SS_PIN          27
 #define RST_PIN         26
@@ -72,20 +64,16 @@ void dump_byte_array(byte *buffer, byte bufferSize, String resultado) {
 }
 
 void setup() {
-  if(!displayReader.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
-
-  displayReader.clearDisplay();
-  displayReader.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
-  displayReader.display();
-  delay(2500); // Pause for 2.5 seconds
-  displayReader.clearDisplay();
-  displayReader.drawBitmap(0, 0, logoULL, 120, 32, 1);
-  displayReader.display();
-  delay(2500); // Pause for 2.5 seconds
-  displayReader.clearDisplay();
+  display.begin(20, 4);
+  // display.clearDisplay();
+  // display.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
+  // display.display();
+  // delay(2500); // Pause for 2.5 seconds
+  // display.clearDisplay();
+  // display.drawBitmap(0, 0, logoULL, 120, 32, 1);
+  // display.display();
+  // delay(2500); // Pause for 2.5 seconds
+  // display.clearDisplay();
   
   pinMode(greenPin, OUTPUT);
   pinMode(redPin, OUTPUT);
@@ -121,19 +109,12 @@ void loop() {
   for (byte i = 0; i < 6; i++) keyReader.keyByte[i] = newkeyAB[i]; //Para las ya establecidas
 
   //En caso de no haber tarjeta o no leerla, no continúa el proceso
-  if (!mfrc522Reader.PICC_IsNewCardPresent()){
+  if (!mfrc522Reader.PICC_IsNewCardPresent()) {
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
-    displayReader.clearDisplay();
-    displayReader.setCursor(0, 0);
-    displayReader.setTextColor(WHITE);
-    displayReader.setTextSize(2);
-    displayReader.println("Acerca la");
-    displayReader.print("tarjeta");
-    displayReader.display();
+    display.home();
+    display.println("Acerca la tarjeta.");
     delay(1000);
-    //Serial.println("No hay tarjeta");
-    //delay(1000);
     return;
   }
   
@@ -143,13 +124,8 @@ void loop() {
     return;
   }
 
-  displayReader.clearDisplay();
-  displayReader.setCursor(0, 0);
-  displayReader.setTextColor(WHITE);
-  displayReader.setTextSize(2);
-  displayReader.println("Leyendo...");
-  displayReader.display();
-  //Serial.println("Tarjeta detectada");
+  display.clear();
+  display.println("Leyendo...");
 
   MFRC522::PICC_Type piccType = mfrc522Reader.PICC_GetType(mfrc522Reader.uid.sak); //Obtiene el tipo de tarjeta
   if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI
@@ -158,7 +134,6 @@ void loop() {
     //Serial.println(F("Tarjeta no compatible :("));
     return;
   }
-
 
   MFRC522::StatusCode status;
 
@@ -210,12 +185,8 @@ void loop() {
     allowed = http.getString();
   }
   else{
-    displayReader.clearDisplay();
-    displayReader.setCursor(0, 0);
-    displayReader.setTextColor(WHITE);
-    displayReader.setTextSize(2);
-    displayReader.println("No hay conexión");
-    displayReader.display();
+    display.clear();
+    display.println("No hay conexión.");
     digitalWrite(redPin, HIGH);
     delay(3000);
     digitalWrite(redPin, LOW);
@@ -224,13 +195,9 @@ void loop() {
   if(allowed){
     digitalWrite(relayPin, HIGH);
     digitalWrite(greenPin, HIGH);
-    displayReader.clearDisplay();
-    displayReader.setCursor(0, 0);
-    displayReader.setTextColor(WHITE);
-    displayReader.setTextSize(2);
-    displayReader.println("¡Acceso concedido!");
-    displayReader.print("¡Bienvenid@, Maker!");
-    displayReader.display();
+    display.clear();
+    display.println("¡Acceso concedido!");
+    display.print("¡Bienvenid@, Maker!");
     delay(2000);
     digitalWrite(relayPin, LOW);
     digitalWrite(greenPin, LOW);

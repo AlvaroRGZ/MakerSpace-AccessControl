@@ -1,13 +1,12 @@
 #include "MakerRFID.hpp"
 
-MakerRFID::MakerRFID() {
+MakerRFID::MakerRFID() : display_(SCREEN_ADDRESS) {
   rfid_ = MFRC522(SS_PIN, RST_PIN);
 }
 
-Adafruit_SSD1306 MakerRFID::GetDisplay() {
+LiquidCrystal_I2C MakerRFID::GetDisplay() {
   return display_;
 }
-
 
 MFRC522 MakerRFID::GetRFID() {
   return rfid_;
@@ -85,22 +84,21 @@ bool MakerRFID::validateCard(void) {
 }
 
 void MakerRFID::StartDisplay() {
-  if (!display_.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever | estaa en la version antigua
-  }
+  display_.begin(20, 4);
 }
 
 void MakerRFID::ShowLogos(int delay_time) {
-  display_.clearDisplay();
-  display_.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
-  display_.display();
-  delay(delay_time); // Pause for 2.5 seconds
-  display_.clearDisplay();
-  display_.drawBitmap(0, 0, logoULL, 120, 32, 1);
-  display_.display();
-  delay(delay_time); // Pause for 2.5 seconds
-  display_.clearDisplay();
+  // This no longer uses Adafruit so a drawBitmap substitute is needed
+  //
+  // display_.clearDisplay();
+  // display_.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
+  // display_.display();
+  // delay(delay_time); // Pause for 2.5 seconds
+  // display_.clearDisplay();
+  // display_.drawBitmap(0, 0, logoULL, 120, 32, 1);
+  // display_.display();
+  // delay(delay_time); // Pause for 2.5 seconds
+  // display_.clearDisplay();
 }
 
 void MakerRFID::DetectCard() {
@@ -108,28 +106,20 @@ void MakerRFID::DetectCard() {
     //Serial.println("No se detecta tarjeta");
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
-    display_.clearDisplay();
-    display_.setCursor(0, 0);
-    display_.setTextColor(WHITE);
-    display_.setTextSize(2);
-    display_.println("Acerca la");
-    display_.print("tarjeta");
-    display_.display();
+    display_.clear();
+    display_.home();
+    display_.print("Acerca la tarjeta.");
     delay(1000);
-  } 
+  }
 
   while (!rfid_.PICC_ReadCardSerial()) {}
-
 }
 
 void MakerRFID::ReadingMessage() {
-  display_.clearDisplay();
-  display_.setCursor(0, 0);
-  display_.setTextColor(WHITE);
-  display_.setTextSize(2);
+  display_.clear();
+  display_.home();
   display_.print("Leyendo...");
-  display_.display();
-  Serial.println("Tarjeta detectada");
+  Serial.println("Tarjeta detectada.");
 }
 
 void MakerRFID::PrintCardDetails() {
@@ -191,23 +181,13 @@ void MakerRFID::ReadAllSectors(byte* buffer, int max_sectors) {
 // Deberiamos poder determinar que rele abrir
 void MakerRFID::PermissionMessage(bool has_permission) {
   if (has_permission) {
-    display_.clearDisplay();
-    display_.setCursor(0, 0);
-    display_.setTextColor(WHITE);
-    display_.setTextSize(2);
+    display_.clear();
+    display_.clear();
     display_.print("Permiso concedido.");
-    display_.display();
-    digitalWrite(relayPin, HIGH);
-    delay(5000);
-    digitalWrite(relayPin, LOW);
-
   } else {
-    display_.clearDisplay();
-    display_.setCursor(0, 0);
-    display_.setTextColor(WHITE);
-    display_.setTextSize(2);
+    display_.clear();
+    display_.clear();
     display_.print("Permisos insuficientes.");
-    display_.display();
   }
 }
 
@@ -240,6 +220,9 @@ String MakerRFID::compareData(byte* buffer) {
 }
 
 void MakerRFID::openLocker() {
+  digitalWrite(relayPin, HIGH);
+  delay(5000);
+  digitalWrite(relayPin, LOW);
   /*
     switch (locker_) { 
       case 0:

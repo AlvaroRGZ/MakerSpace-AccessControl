@@ -5,18 +5,12 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <HTTPClient.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include "logos.h"
+#include <LiquidCrystal_I2C.h>
+#include <Keypad.h>
 
-
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 32 // OLED display height, in pixels
-
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#define SCREEN_ADDRESS 0x3F ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+LiquidCrystal_I2C display(SCREEN_ADDRESS);
 
 #define SS_PIN          27
 #define RST_PIN         26
@@ -39,40 +33,35 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
     }
 }
 
-
 void setup() {
-    if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-        Serial.println(F("SSD1306 allocation failed"));
-        for(;;); // Don't proceed, loop forever
-    }
+  display.begin(20, 4);
+  // display.clearDisplay();
+  // display.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
+  // display.display();
+  // delay(2500); // Pause for 2.5 seconds
+  // display.clearDisplay();
+  // display.drawBitmap(0, 0, logoULL, 120, 32, 1);
+  // display.display();
+  // delay(2500); // Pause for 2.5 seconds
+  // display.clearDisplay();
+  
+  Serial.begin(9600);
+  SPI.begin();
 
-    display.clearDisplay();
-    display.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
-    display.display();
-    delay(2500); // Pause for 2.5 seconds
-    display.clearDisplay();
-    display.drawBitmap(0, 0, logoULL, 120, 32, 1);
-    display.display();
-    delay(2500); // Pause for 2.5 seconds
-    display.clearDisplay();
-    
-    Serial.begin(9600);
-    SPI.begin();
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password); //Establece la conexión
 
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password); //Establece la conexión
+  Serial.print("Conectando al WiFi...");
+  while (WiFi.status() != WL_CONNECTED) {
+      Serial.print('.');
+      delay(1000);
+  }
 
-    Serial.print("Conectando al WiFi...");
-    while (WiFi.status() != WL_CONNECTED) {
-        Serial.print('.');
-        delay(1000);
-    }
+  Serial.println(WiFi.localIP());
+  Serial.print("RRSI: ");
+  Serial.println(WiFi.RSSI());
 
-    Serial.println(WiFi.localIP());
-    Serial.print("RRSI: ");
-    Serial.println(WiFi.RSSI());
-
-    mfrc522.PCD_Init();
+  mfrc522.PCD_Init();
 }
 
 void loop() {
@@ -84,7 +73,7 @@ void loop() {
 
   //En caso de no haber tarjeta o no leerla, no continúa el proceso
   if (!mfrc522.PICC_IsNewCardPresent()){
-    Serial.println("No hay tarjeta");
+    Serial.println("No hay tarjeta.");
     delay(1000);
     return;
   }
@@ -95,7 +84,7 @@ void loop() {
     return;
   }
 
-  Serial.println("Tarjeta detectada");
+  Serial.println("Tarjeta detectada.");
 
   MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak); //Obtiene el tipo de tarjeta
   if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI

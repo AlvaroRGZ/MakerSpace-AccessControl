@@ -7,17 +7,12 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <HTTPClient.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include "logos.h"
 #include <Keypad.h>
+#include <LiquidCrystal_I2C.h>
 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 32 // OLED display height, in pixels
+#define SCREEN_ADDRESS 0x3F
 
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 // No tocar el 0 y el 1
 #define SS_PIN          27
 #define RST_PIN         26
@@ -33,7 +28,7 @@ class MakerRFID {
     MakerRFID();
 
     // ####### GETTERS #######
-    Adafruit_SSD1306 GetDisplay();
+    LiquidCrystal_I2C GetDisplay();
     MFRC522 GetRFID();
 
     // ####### SET UP #######
@@ -73,7 +68,7 @@ class MakerRFID {
     void openLocker();
     
   private:
-    Adafruit_SSD1306 display_; // Conexion con pantalla https://github.com/adafruit/Adafruit_SSD1306
+    LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
     // char* ssid_;
     // char* password_;
