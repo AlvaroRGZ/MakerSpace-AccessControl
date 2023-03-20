@@ -6,6 +6,7 @@ MakerRFID makerspace;
 byte default_key[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 byte alternative_key[6] = {0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E};
 byte buffer[34];
+const unsigned dataBlock = 10;
 
 #define KEYBOARD_R1_PIN 9
 #define KEYBOARD_R2_PIN 8
@@ -32,8 +33,8 @@ byte colPins[COLS] = {KEYBOARD_C1_PIN, KEYBOARD_C2_PIN, KEYBOARD_C3_PIN,
 Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
-    char* ssid = (char*)'A';
-    char* password = (char*)';';
+    String ssid = "Phoenix";
+    String password = 'aizc3525';
 
     makerspace.StartDisplay();
     makerspace.ShowLogos();
@@ -41,13 +42,13 @@ void setup() {
     pinMode(greenPin, OUTPUT);
     pinMode(redPin, OUTPUT);
     pinMode(relayPin, OUTPUT);
-    digitalWrite(greenPin, LOW);
-    digitalWrite(redPin, LOW);
-    digitalWrite(relayPin, LOW);
+    // digitalWrite(greenPin, LOW);
+    // digitalWrite(redPin, LOW);
+    // digitalWrite(relayPin, LOW);
 
     makerspace.StartSerial();
     makerspace.StartSPI();
-    // makerspace.SetWiFi(ssid, password);
+    makerspace.StartRFID();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(alternative_key);
     // Conectar con teclado
@@ -60,23 +61,24 @@ void loop() {
   makerspace.DetectCard();
   makerspace.ReadingMessage();
   digitalWrite(greenPin, HIGH);
-  digitalWrite(redPin, HIGH);
   makerspace.PrintCardDetails();
 
   makerspace.validateCard();
 
   makerspace.AuthenticateCard();
 
-  makerspace.ReadSector(buffer, 2);
-
+  makerspace.ReadSector(buffer, dataBlock);
+  digitalWrite(greenPin, LOW);
   makerspace.readLockerFromKeyboard(keypad);
   
   // Llamada al server con los datos de la tarjeta
   if (makerspace.compareData(buffer) != "") {
     makerspace.PermissionMessage(true);
+    digitalWrite(greenPin, HIGH);
     makerspace.openLocker();
   } else {
     makerspace.PermissionMessage(false);
+    digitalWrite(redPin, HIGH);
   }
   
   makerspace.StopRFID();

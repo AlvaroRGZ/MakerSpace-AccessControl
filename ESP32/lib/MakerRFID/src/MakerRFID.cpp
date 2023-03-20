@@ -19,7 +19,7 @@ void MakerRFID::SetWiFi(char* ssid, char* password) {
 }
 */
 
-void MakerRFID::StartWiFi(char* ssid, char* password) {
+void MakerRFID::StartWiFi(String ssid, String password) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password); //Establece la conexión
 
@@ -140,8 +140,7 @@ void MakerRFID::DumpByteArray(byte *buffer, byte bufferSize) {
   }
 }
 
-void MakerRFID::ReadSector(byte* buffer, int sector) {
-  int blockAddr = sector;
+void MakerRFID::ReadSector(byte* buffer, int blockAddr) {
   byte size = sizeof(buffer);
   status_ = (MFRC522::StatusCode) rfid_.MIFARE_Read(blockAddr, buffer, &size);
   if (status_ != MFRC522::STATUS_OK) {
@@ -194,24 +193,37 @@ void MakerRFID::PermissionMessage(bool has_permission) {
 // Comunication with server
 // send uid, password and locker to server for it to check if valid.
 String MakerRFID::compareData(byte* buffer) {
-  std::string serverName = "http://127.0.0.1/getdata.php?";
+  std::string serverName = "http://127.0.0.1/paginas/reply_comparation.php?";
+  // UID
   std::string uidString = "";
   for (uint8_t i = 0; i < rfid_.uid.size; i++) {
     uidString += std::string(rfid_.uid.uidByte[i], sizeof(rfid_.uid.uidByte[i]));
   }
-  std::string user = "user=" + uidString;
+  std::string user = "uid=" + uidString;
+  // for (uint8_t i = 0; i < sizeof(buffer); i++) {
+  //   pass += std::string(buffer[i], sizeof(buffer[i]));
+  // }
+  // PASSWORD
   char* passData;
   memcpy(passData, buffer, sizeof(buffer));
-  std::string password = "pass=" + std::string(passData);
+  std::string password = "psswd=" + std::string(passData);
+  // LOCKER
   std::string locker = "locker=" + std::to_string(locker_);
-  std::string Srequest = serverName + user + "&" + password + "&" + locker;
-  char* request = new char[Srequest.length() + 1];
+  // COMBINE REQUEST
+  std::string request = serverName + user + "&" + password + "&" + locker;
+  // char* request = new char[Srequest.length() + 1];
+  // strcpy(request, Srequest.c_str());
+
+  // QUERY
   String output;
   HTTPClient http;
-  http.begin(request);
+  http.begin(request.c_str());
   int httpCode = http.GET();
-  if(httpCode > 0 && http.getString()){
+  if(httpCode > 0){
     output = http.getString();
+    Serial.print("Nombre de usuario: "); 
+    Serial.println(output);
+    Serial.println("[Code]: " + httpResponseCode);
   } else {
     display_.println("[ERROR] Server request failed. Aborting...");
   }
@@ -245,5 +257,6 @@ void MakerRFID::openLocker() {
 void MakerRFID::readLockerFromKeyboard(Keypad &keypad) {
   char pressedKey = keypad.waitForKey();
   locker_ = uint8_t(pressedKey);
+  // locker_ = uint8_t(1);
 }
 

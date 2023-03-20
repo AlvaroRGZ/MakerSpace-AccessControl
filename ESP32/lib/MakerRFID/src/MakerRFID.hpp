@@ -32,7 +32,7 @@ class MakerRFID {
     MFRC522 GetRFID();
 
     // ####### SET UP #######
-    void StartWiFi(char* ssid, char* password);
+    void StartWiFi(String ssid, String password);
     // void SetWiFi(char*, char*);
     void StartSerial(int = 9600);
     void StartSPI();
@@ -48,7 +48,7 @@ class MakerRFID {
     void AuthenticateCard(int = 0);
     bool validateCard();
     void DetectCard();
-    void ReadSector(byte*, int);
+    void ReadSector(byte*, int blockAddr);
     void ReadSectors(byte*, int, int);
     void ReadAllSectors(byte*, int = 16);
 
