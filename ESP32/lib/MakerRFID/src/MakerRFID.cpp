@@ -79,7 +79,7 @@ bool MakerRFID::validateCard(void) {
     Serial.println(F("Tarjeta no compatible :("));
     return false;
   }
-  Serial.println("Tarjeta compatible con el sistema");
+  Serial.println("Tarjeta compatible con el sistema.");
   return true;
 }
 
@@ -117,7 +117,6 @@ void MakerRFID::DetectCard() {
 
 void MakerRFID::ReadingMessage() {
   display_.clear();
-  display_.home();
   display_.print("Leyendo...");
   Serial.println("Tarjeta detectada.");
 }
@@ -181,10 +180,8 @@ void MakerRFID::ReadAllSectors(byte* buffer, int max_sectors) {
 void MakerRFID::PermissionMessage(bool has_permission) {
   if (has_permission) {
     display_.clear();
-    display_.clear();
     display_.print("Permiso concedido.");
   } else {
-    display_.clear();
     display_.clear();
     display_.print("Permisos insuficientes.");
   }
@@ -215,6 +212,7 @@ String MakerRFID::compareData(byte* buffer) {
   // strcpy(request, Srequest.c_str());
 
   // QUERY
+
   String output;
   HTTPClient http;
   http.begin(request.c_str());
@@ -228,6 +226,11 @@ String MakerRFID::compareData(byte* buffer) {
   }
   // Si no se recibe nada devuelve una cadena vacia
   return output;
+}
+
+void MakerRFID::readLockerFromKeyboard(Keypad &keypad) {
+  char pressedKey = keypad.waitForKey();
+  locker_ = uint8_t(pressedKey);
 }
 
 void MakerRFID::openLocker() {
@@ -259,3 +262,52 @@ void MakerRFID::readLockerFromKeyboard(Keypad &keypad) {
   // locker_ = uint8_t(1);
 }
 
+void MakerRFID::setKey(byte* buffer) {
+  for (uint8_t i = 0; i < 16; ++i) {
+    key_.keyByte[i] = buffer[i];
+  }
+}
+
+byte* MakerRFID::generatePassword() {
+  byte password[16];
+  for (uint8_t i = 0; i < 16; ++i) {
+    // TODO: true random
+    password[i] = byte(random(0, 255));
+  }
+  Serial.println("Generada nueva contraseña aleatoria.");
+  return password;
+}
+
+void MakerRFID::writePassword(byte* password, uint8_t block) {
+  MFRC522::StatusCode status = rfid_.MIFARE_Write(block, password, 16);
+  if (status != MFRC522::STATUS_OK) {
+    Serial.println(F("Fallo de escritura de la contraseña en la tarjeta."));
+    Serial.println(rfid_.GetStatusCodeName(status));
+  } else {
+    Serial.println(F("Contraseña escrita con éxito en la tarjeta."));
+  }
+}
+
+void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
+  // std::string serverName = "http://127.0.0.1/getdata.php?";
+  std::string uid = "uid=";
+  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
+    uid += std::string(rfid_.uid.uidByte[i], sizeof(rfid_.uid.uidByte[i]));
+  }
+  
+  char* passData;
+  memcpy(passData, passwordBuffer, sizeof(passwordBuffer));
+  std::string password = "psswd=" + std::string(passData);
+
+  std::string request = serverAddress + uid + "&" + password;
+
+  String output;
+  HTTPClient http;
+  http.begin(request.c_str());
+  int httpCode = http.GET();
+  if(httpCode > 0) {
+    Serial.println("¡Subida al servidor correcta!");
+  } else {
+    Serial.println("Error en la subida, comprueba la conexión y contacta con el administrador.");
+  }
+}

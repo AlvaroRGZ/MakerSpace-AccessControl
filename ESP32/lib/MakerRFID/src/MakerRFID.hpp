@@ -22,6 +22,7 @@
 #define redPin          32
 #define relayPin        33
 #define PERM            "ARM1"
+#define randomSeedPin   
 
 class MakerRFID {
   public:
@@ -66,6 +67,11 @@ class MakerRFID {
     void PermissionMessage(bool);
     void readLockerFromKeyboard(Keypad &keypad);
     void openLocker();
+
+    void setKey(byte* buffer);
+    byte* generatePassword();
+    void writePassword(byte* password, uint8_t block);
+    void sendPacket(std::string serverAddress, byte* password);
     
   private:
     LiquidCrystal_I2C display_;
