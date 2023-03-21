@@ -5,7 +5,6 @@
 MakerRFID makerspace;
 byte default_key[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 byte alternative_key[6] = {0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E};
-byte buffer[18];
 const unsigned dataBlock = 10;
 
 #define KEYBOARD_R1_PIN 9
@@ -50,12 +49,13 @@ void setup() {
     makerspace.StartSPI();
     makerspace.StartRFID();
     makerspace.StartWiFi(ssid, password);
-    makerspace.SetKey(alternative_key);
+    makerspace.SetKey(default_key);
     // Conectar con teclado
 }
 
 void loop() {
   
+  byte buffer[32];
   // makerspace.waitForKeyboard();
   // makerspace.displayRequest();
   makerspace.DetectCard();
