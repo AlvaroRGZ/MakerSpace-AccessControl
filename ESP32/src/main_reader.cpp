@@ -5,7 +5,7 @@
 MakerRFID makerspace;
 byte default_key[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 byte alternative_key[6] = {0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E};
-byte buffer[34];
+byte buffer[18];
 const unsigned dataBlock = 10;
 
 #define KEYBOARD_R1_PIN 9
@@ -33,8 +33,8 @@ byte colPins[COLS] = {KEYBOARD_C1_PIN, KEYBOARD_C2_PIN, KEYBOARD_C3_PIN,
 Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
-    String ssid = "Phoenix";
-    String password = "aizc3525";
+    String ssid = "meikspeis"; // "Phoenix";
+    String password = "meikspeis"; // "aizc3525";
 
     makerspace.StartDisplay();
     makerspace.ShowLogos();
@@ -68,8 +68,8 @@ void loop() {
   makerspace.AuthenticateCard();
 
   makerspace.ReadSector(buffer, dataBlock);
-  digitalWrite(greenPin, LOW);
-  makerspace.readLockerFromKeyboard(keypad);
+  // digitalWrite(greenPin, LOW);
+  // makerspace.readLockerFromKeyboard(keypad);
   
   // Llamada al server con los datos de la tarjeta
   if (makerspace.compareData(buffer) != "") {

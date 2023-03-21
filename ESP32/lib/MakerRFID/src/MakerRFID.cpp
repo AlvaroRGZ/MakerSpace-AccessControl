@@ -76,10 +76,10 @@ bool MakerRFID::validateCard(void) {
   if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI
     &&  piccType != MFRC522::PICC_TYPE_MIFARE_1K
     &&  piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
-    // Serial.println(F("Tarjeta no compatible :("));
+    Serial.println(F("Tarjeta no compatible :("));
     return false;
   }
-  // Serial.println("Tarjeta compatible con el sistema");
+  Serial.println("Tarjeta compatible con el sistema");
   return true;
 }
 
@@ -103,7 +103,7 @@ void MakerRFID::ShowLogos(int delay_time) {
 
 void MakerRFID::DetectCard() {
   while (!rfid_.PICC_IsNewCardPresent()) {
-    //Serial.println("No se detecta tarjeta");
+    Serial.println("No se detecta tarjeta");
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
     display_.clear();
