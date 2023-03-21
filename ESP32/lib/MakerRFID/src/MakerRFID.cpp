@@ -21,7 +21,7 @@ void MakerRFID::SetWiFi(char* ssid, char* password) {
 
 void MakerRFID::StartWiFi(String ssid, String password) {
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password); //Establece la conexión
+  WiFi.begin(ssid.c_str(), password.c_str()); //Establece la conexión
 
   Serial.print("Connecting to WiFi ..");
   while (WiFi.status() != WL_CONNECTED) {
@@ -223,7 +223,6 @@ String MakerRFID::compareData(byte* buffer) {
     output = http.getString();
     Serial.print("Nombre de usuario: "); 
     Serial.println(output);
-    Serial.println("[Code]: " + httpResponseCode);
   } else {
     display_.println("[ERROR] Server request failed. Aborting...");
   }

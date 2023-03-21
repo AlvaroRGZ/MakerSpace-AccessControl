@@ -34,7 +34,7 @@ Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
     String ssid = "Phoenix";
-    String password = 'aizc3525';
+    String password = "aizc3525";
 
     makerspace.StartDisplay();
     makerspace.ShowLogos();
