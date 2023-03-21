@@ -249,12 +249,6 @@ void MakerRFID::openLocker() {
   */
 }
 
-void MakerRFID::readLockerFromKeyboard(Keypad &keypad) {
-  char pressedKey = keypad.waitForKey();
-  locker_ = uint8_t(pressedKey);
-  // locker_ = uint8_t(1);
-}
-
 void MakerRFID::setKey(byte* buffer) {
   for (uint8_t i = 0; i < 16; ++i) {
     key_.keyByte[i] = buffer[i];
