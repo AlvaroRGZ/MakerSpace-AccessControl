@@ -67,7 +67,7 @@ void loop() {
   // makerspace.displayRequest();
   makerspace.DetectCard();
   makerspace.ReadingMessage();
-  digitalWrite(greenPin, HIGH);
+  //digitalWrite(greenPin, HIGH);
   makerspace.PrintCardDetails();
 
   makerspace.validateCard();
@@ -76,7 +76,7 @@ void loop() {
 
   makerspace.ReadSector(buffer, dataBlock);
   // digitalWrite(greenPin, LOW);
-  // makerspace.readLockerFromKeyboard(keypad);
+  makerspace.readLockerFromKeyboard(keypad);
   
   // Llamada al server con los datos de la tarjeta
   makerspace.sendPacket("f", buffer);

@@ -229,8 +229,8 @@ String MakerRFID::compareData(byte* buffer) {
 }
 
 void MakerRFID::readLockerFromKeyboard(Keypad &keypad) {
-  char pressedKey = keypad.waitForKey();
-  locker_ = uint8_t(pressedKey);
+  // char pressedKey = keypad.waitForKey();
+  locker_ = 1;// uint8_t(pressedKey);
 }
 
 void MakerRFID::openLocker() {
@@ -286,10 +286,10 @@ void MakerRFID::writePassword(byte* password, uint8_t block) {
 
 void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   // std::string serverName = "http://127.0.0.1/getdata.php?";
-  String uid = "uid=67 FF KK 43";
-  /*for (uint8_t i = 0; i < rfid_.uid.size; i++) {
-    uid += String(rfid_.uid.uidByte[i], sizeof(rfid_.uid.uidByte[i]));
-  }*/
+  String uid = "uid=";
+  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
+    uid += String(rfid_.uid.uidByte[i], HEX);
+  }
   // 
   // char* passData;
   // memcpy(passData, passwordBuffer, sizeof(passwordBuffer));
@@ -298,24 +298,30 @@ void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   // PASSWORD
   //char* passData;
   //memcpy(passData, buffer, 16);
-  String password = "psswd=" + String((char*)passwordBuffer);
+  String password = "psswd=passx";//String((char*)passwordBuffer);
+  for (uint8_t i = 0; i < 16; i++) {
+    uid += String(passwordBuffer[i], HEX);
+  }
   // LOCKER
   String locker = "locker=" + String(locker_);
   // COMBINE REQUEST
   // String request = serverName + user + "&" + password + "&" + locker;
   String request = "http://10.42.0.1:8080/paginas/reply_comparation.php?";//serverAddress + uid + "&" + password;
   request += uid;
-  request + "&";
+  request += "&";
   request += password;
-  request + "&";
+  request += "&";
   request += locker;
 
+    Serial.println(request);
   String output;
   HTTPClient http;
   http.begin(request.c_str());
   int httpCode = http.GET();
   if(httpCode > 0) {
-    Serial.println("¡Subida al servidor correcta!");
+    Serial.print("Bienvenido ");
+    Serial.println(http.getString());
+
   } else {
     Serial.println("Error en la subida, comprueba la conexión y contacta con el administrador.");
   }
