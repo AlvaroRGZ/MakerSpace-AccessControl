@@ -35,9 +35,6 @@ void setup() {
     String ssid = "makerspace-controlserver";
     String password = "meikspeis";
 
-    makerspace.StartDisplay();
-    makerspace.ShowLogos();
-    
     pinMode(greenPin, OUTPUT);
     pinMode(redPin, OUTPUT);
     pinMode(relay1Pin, OUTPUT);
@@ -56,21 +53,18 @@ void setup() {
     makerspace.ShowLogos();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
-    Serial.println("ANTES DE CONNECT");
-    //makerspace.connectDB();
-    Serial.println("FUEEEEEEEEEEEEEEEEERA");
+    makerspace.connectDB();
     // Conectar con teclado
 }
 
 void loop() {
-  
   byte buffer[32];
   // makerspace.waitForKeyboard();
   // makerspace.displayRequest();
   makerspace.DetectCard();
   makerspace.ReadingMessage();
   digitalWrite(greenPin, HIGH);
-  digitalWrite(greenLED, HIGH);
+  // digitalWrite(greenLED, HIGH);
   makerspace.PrintCardDetails();
 
   makerspace.validateCard();

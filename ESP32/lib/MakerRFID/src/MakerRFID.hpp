@@ -46,8 +46,6 @@
 #define MAX_SIZE_BLOCK  16
 #define greenPin        14
 #define redPin          32
-#define greenLED        14
-
 
 #define boozerPin       12
 #define relay1Pin       33
@@ -112,7 +110,6 @@ class MakerRFID {
     void setKey(byte* buffer);
     byte* generatePassword();
     void writePassword(byte* password, uint8_t block);
-    void initializeDBConnection(char* buffer);
     void sendPacket(std::string serverAddress, byte* password);
     
   private:

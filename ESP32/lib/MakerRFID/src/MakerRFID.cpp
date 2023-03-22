@@ -87,10 +87,9 @@ void MakerRFID::StartDisplay() {
   Serial.println("Start display() called.");
   int status = display_.begin(20, 4);
   if (status) {
-		hd44780::fatalError(status);
-    Serial.println("La pantalla tiene un problema.");
+    Serial.println("Pantalla inicializada con éxito.");
   } else {
-    Serial.println("La pantalla funciona bien.");
+    Serial.println("Hubo un problema al inicializar la pantalla.");
   }
 }
 
@@ -287,17 +286,6 @@ void MakerRFID::writePassword(byte* password, uint8_t block) {
   } else {
     Serial.println(F("Contraseña escrita con éxito en la tarjeta."));
   }
-}
-
-void MakerRFID::initializeDBConnection(char* buffer) {
-  WiFiClient client;
-  PGconnection conn(&client, 0, 1024, buffer);
-
-  IPAddress PGIP(10,159,5,105);
-  const char user[] = "db_username";       // your database user
-  const char password[] = "db_password";   // your database password
-  const char dbname[] = "db_name";
-  conn_->setDbLogin(PGIP, user, password, dbname, "utf8");
 }
 
 void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
