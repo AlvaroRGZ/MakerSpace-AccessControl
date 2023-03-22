@@ -32,15 +32,19 @@ byte colPins[COLS] = {KEYBOARD_C1_PIN, KEYBOARD_C2_PIN, KEYBOARD_C3_PIN,
 Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
-    String ssid = "meikspeis"; // "Phoenix";
-    String password = "meikspeis"; // "aizc3525";
+    String ssid = "Phoenix";
+    String password = "aizc3525";
 
     makerspace.StartDisplay();
     makerspace.ShowLogos();
     
     pinMode(greenPin, OUTPUT);
     pinMode(redPin, OUTPUT);
-    pinMode(relayPin, OUTPUT);
+    pinMode(relay1Pin, OUTPUT);
+    pinMode(relay2Pin, OUTPUT);
+    pinMode(relay3Pin, OUTPUT);
+    pinMode(boozerPin, OUTPUT);
+    digitalWrite(boozerPin, HIGH);
     // digitalWrite(greenPin, LOW);
     // digitalWrite(redPin, LOW);
     // digitalWrite(relayPin, LOW);
@@ -74,11 +78,12 @@ void loop() {
   // Llamada al server con los datos de la tarjeta
   if (makerspace.compareData(buffer) != "") {
     makerspace.PermissionMessage(true);
-    digitalWrite(greenPin, HIGH);
-    makerspace.openLocker();
   } else {
     makerspace.PermissionMessage(false);
-    digitalWrite(redPin, HIGH);
+    digitalWrite(greenPin, HIGH);
+    digitalWrite(boozerPin, LOW);
+    makerspace.openLocker();
+    digitalWrite(greenPin, LOW);
   }
   
   makerspace.StopRFID();
