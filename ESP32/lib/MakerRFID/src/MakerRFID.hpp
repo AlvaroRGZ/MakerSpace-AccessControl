@@ -123,6 +123,8 @@ class MakerRFID {
     uint8_t locker_;
     PGconnection* conn_;
     char dbBuffer_[1024]; // Internal buffer for ddb connection
-};
+    WiFiClient client_;
+};  
+
 
 #endif

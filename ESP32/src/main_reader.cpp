@@ -53,7 +53,7 @@ void setup() {
     makerspace.ShowLogos();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
-    makerspace.connectDB();
+    //makerspace.connectDB();
     // Conectar con teclado
 }
 
@@ -63,8 +63,8 @@ void loop() {
   // makerspace.displayRequest();
   makerspace.DetectCard();
   makerspace.ReadingMessage();
-  digitalWrite(greenPin, HIGH);
   // digitalWrite(greenLED, HIGH);
+  //digitalWrite(greenPin, HIGH);
   makerspace.PrintCardDetails();
 
   makerspace.validateCard();
