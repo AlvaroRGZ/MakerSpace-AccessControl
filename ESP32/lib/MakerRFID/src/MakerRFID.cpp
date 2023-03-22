@@ -232,9 +232,11 @@ void MakerRFID::readLockerFromKeyboard(Keypad &keypad) {
 }
 
 void MakerRFID::openLocker() {
-  digitalWrite(relayPin, HIGH);
+  delay(1000);
+  digitalWrite(boozerPin, HIGH);
+  digitalWrite(relay1Pin, HIGH);
   delay(5000);
-  digitalWrite(relayPin, LOW);
+  digitalWrite(relay1Pin, LOW);
   /*
     switch (locker_) { 
       case 0:

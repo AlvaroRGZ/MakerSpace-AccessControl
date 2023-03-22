@@ -18,18 +18,6 @@
 
 #define SCREEN_ADDRESS 0x3F
 
-// No tocar el 0 y el 1
-#define SS_PIN          26
-#define RST_PIN         27
-#define SIZE_BUFFER     18
-#define MAX_SIZE_BLOCK  16
-#define greenPin        12
-#define redPin          32
-#define relayPin        33
-#define greenLED        14
-#define PERM            "ARM1"
-#define randomSeedPin   
-
 /**
  * (Relés son interruptores)
  * RELÉ1 -> D33
@@ -46,6 +34,26 @@
  * 
  * D12, D14 (SOLAPAMIENTO)
  */
+
+// No tocar el 0 y el 1
+#define SS_PIN          26
+#define RST_PIN         27
+#define SIZE_BUFFER     18
+#define MAX_SIZE_BLOCK  16
+#define greenPin        14
+#define redPin          32
+#define greenLED        14
+
+
+#define boozerPin       12
+#define relay1Pin       33
+#define relay2Pin       25
+#define relay3Pin       13
+#define PERM            "ARM1"
+#define randomSeedPin   
+
+#define SDAPin       21
+#define SSLPin       22
 
 class MakerRFID {
   public:
