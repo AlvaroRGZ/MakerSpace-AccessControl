@@ -10,15 +10,9 @@
 #include "logos.h"
 #include <Keypad.h>
 
-#include <Wire.h>
-#include <hd44780.h>
-#include <hd44780ioClass/hd44780_I2Cexp.h>
+#include <LiquidCrystal_I2C.h>
 
 #include <SimplePgSQL.h>
-
-
-
-#include "../../SimplePgSQL/src/SimplePgSQL.h"
 
 #define SCREEN_ADDRESS 0x3F
 
@@ -63,7 +57,7 @@ class MakerRFID {
     ~MakerRFID();
 
     // ####### GETTERS #######
-    hd44780_I2Cexp GetDisplay();
+    LiquidCrystal_I2C GetDisplay();
     MFRC522 GetRFID();
 
     // ####### SET UP #######
@@ -113,7 +107,7 @@ class MakerRFID {
     void sendPacket(std::string serverAddress, byte* password);
     
   private:
-    hd44780_I2Cexp display_;
+    LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
     
     // char* ssid_;

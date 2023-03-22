@@ -1,16 +1,17 @@
 #include "MakerRFID.hpp"
 
-MakerRFID::MakerRFID(): display_(SCREEN_ADDRESS) {
+MakerRFID::MakerRFID(): display_(SCREEN_ADDRESS, 20, 4) {
   conn_ = NULL;
   rfid_ = MFRC522(SS_PIN, RST_PIN);
 }
+
 MakerRFID::~MakerRFID() {
   if (conn_ != nullptr) {
     delete conn_;
   }
 }
 
-hd44780_I2Cexp MakerRFID::GetDisplay() {
+LiquidCrystal_I2C MakerRFID::GetDisplay() {
   return display_;
 }
 
@@ -85,12 +86,11 @@ bool MakerRFID::validateCard(void) {
 
 void MakerRFID::StartDisplay() {
   Serial.println("Start display() called.");
-  int status = display_.begin(20, 4);
-  if (status) {
-    Serial.println("Pantalla inicializada con éxito.");
-  } else {
-    Serial.println("Hubo un problema al inicializar la pantalla.");
-  }
+  display_.init();
+  display_.clear();
+  display_.backlight();
+  display_.setCursor(2, 0);
+  display_.print("Pantalla encendida.");
 }
 
 void MakerRFID::ShowLogos(int delay_time) {
