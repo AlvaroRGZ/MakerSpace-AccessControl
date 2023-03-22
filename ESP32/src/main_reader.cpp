@@ -32,8 +32,8 @@ byte colPins[COLS] = {KEYBOARD_C1_PIN, KEYBOARD_C2_PIN, KEYBOARD_C3_PIN,
 Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
-    String ssid = "Phoenix";
-    String password = "aizc3525";
+    String ssid = "makerspace-controlserver";
+    String password = "meikspeis";
 
     makerspace.StartDisplay();
     makerspace.ShowLogos();
@@ -54,6 +54,9 @@ void setup() {
     makerspace.StartRFID();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
+    Serial.println("ANTES DE CONNECT");
+    makerspace.connectDB();
+    Serial.println("FUEEEEEEEEEEEEEEEEERA");
     // Conectar con teclado
 }
 
@@ -88,3 +91,5 @@ void loop() {
   
   makerspace.StopRFID();
 }
+
+// Mensaje friendly para el usuario

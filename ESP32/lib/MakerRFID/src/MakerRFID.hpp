@@ -11,7 +11,12 @@
 #include <Keypad.h>
 #include <LiquidCrystal_I2C.h>
 
+
+
+#include "../../SimplePgSQL/src/SimplePgSQL.h"
+
 #define SCREEN_ADDRESS 0x3F
+
 
 // No tocar el 0 y el 1
 #define SS_PIN          27
@@ -32,6 +37,7 @@
 class MakerRFID {
   public:
     MakerRFID();
+    ~MakerRFID();
 
     // ####### GETTERS #######
     LiquidCrystal_I2C GetDisplay();
@@ -64,6 +70,11 @@ class MakerRFID {
     // Comunication with server
     String compareData(byte* buffer);
 
+    // ####### DB operations #######
+
+    void connectDB(void);
+    String executeQuery(byte* Buffer);
+
     // ####### Display information #######
     void ReadingMessage();
     void PrintCardDetails();
@@ -86,6 +97,8 @@ class MakerRFID {
     MFRC522::MIFARE_Key key_;
     MFRC522::StatusCode status_;
     uint8_t locker_;
+    PGconnection* conn_;
+    char dbBuffer_[1024]; // Internal buffer for ddb connection
 };
 
 #endif
