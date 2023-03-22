@@ -16,6 +16,10 @@
 
 #include <SimplePgSQL.h>
 
+
+
+#include "../../SimplePgSQL/src/SimplePgSQL.h"
+
 #define SCREEN_ADDRESS 0x3F
 
 /**
@@ -58,6 +62,7 @@
 class MakerRFID {
   public:
     MakerRFID();
+    ~MakerRFID();
 
     // ####### GETTERS #######
     hd44780_I2Cexp GetDisplay();
@@ -90,6 +95,11 @@ class MakerRFID {
     // Comunication with server
     String compareData(byte* buffer);
 
+    // ####### DB operations #######
+
+    void connectDB(void);
+    String executeQuery(byte* Buffer);
+
     // ####### Display information #######
     void ReadingMessage();
     void PrintCardDetails();
@@ -109,12 +119,13 @@ class MakerRFID {
     hd44780_I2Cexp display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
     
-    PGconnection connection_;
     // char* ssid_;
     // char* password_;
     MFRC522::MIFARE_Key key_;
     MFRC522::StatusCode status_;
     uint8_t locker_;
+    PGconnection* conn_;
+    char dbBuffer_[1024]; // Internal buffer for ddb connection
 };
 
 #endif

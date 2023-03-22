@@ -1,7 +1,13 @@
 #include "MakerRFID.hpp"
 
-MakerRFID::MakerRFID() {
+MakerRFID::MakerRFID(): display_(SCREEN_ADDRESS) {
+  conn_ = nullptr;
   rfid_ = MFRC522(SS_PIN, RST_PIN);
+}
+MakerRFID::~MakerRFID() {
+  if (conn_ != nullptr) {
+    delete conn_;
+  }
 }
 
 hd44780_I2Cexp MakerRFID::GetDisplay() {
@@ -25,6 +31,7 @@ void MakerRFID::StartWiFi(String ssid, String password) {
   Serial.println(WiFi.localIP());
   Serial.print("RRSI: ");
   Serial.println(WiFi.RSSI());
+  Serial.println("SALGO DE WIFI");
 }
 
 void MakerRFID::StartSerial(int baudrate) {
@@ -290,8 +297,7 @@ void MakerRFID::initializeDBConnection(char* buffer) {
   const char user[] = "db_username";       // your database user
   const char password[] = "db_password";   // your database password
   const char dbname[] = "db_name";
-  connection_.setDbLogin(PGIP, user, password, dbname, "utf8");
-
+  conn_->setDbLogin(PGIP, user, password, dbname, "utf8");
 }
 
 void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
@@ -317,4 +323,49 @@ void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   // } else {
   //   Serial.println("Error en la subida, comprueba la conexión y contacta con el administrador.");
   // }
+}
+
+void MakerRFID::connectDB(void) {
+  WiFiClient client; // Se supone inicializado en el setup tras startWifi()
+    Serial.println("voy a con");
+    delay(1000);
+  conn_ = new PGconnection(&client, 0, 1024, dbBuffer_);
+    delay(1000);
+    Serial.println("hice con");
+    delay(1000);
+  IPAddress PGIP(10,159,5,105); // IP del servidor de la base de datos
+
+  conn_->setDbLogin(PGIP, "postgres", "postgres", "makerspacecontrol", "utf8");
+  if (conn_->status() == CONNECTION_BAD) {
+    Serial.println("setDbLogin() failed");
+    Serial.print("CODE: ");
+    Serial.println(conn_->status());
+  } else {
+    Serial.println("Conexión a la base de datos establecida.");
+  }
+}
+
+String MakerRFID::executeQuery(byte* Buffer) {
+  // std::string serverName = "http://127.0.0.1/getdata.php?";
+  String uid = "uid=";
+  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
+    uid += (char*)(rfid_.uid.uidByte[i], sizeof(rfid_.uid.uidByte[i]));
+  }
+  
+  char* passData;
+  memcpy(passData, Buffer, sizeof(Buffer));
+  String password = "psswd=" + String(passData);
+
+  String query =  String("SELECT nombre FROM usuarios NATURAL JOIN permisos ");
+         query += String("WHERE uid = '" + uid + "' AND passwd = '" + password + "' ");
+         query += String("AND armario_" + char(locker_));
+         query += String(" = 1;");
+
+  String output;
+  conn_->execute(query.c_str());
+  if(conn_->getData() > 0) {
+    Serial.println("¡Subida al servidor correcta!");
+  } else {
+    Serial.println("Error en la subida, comprueba la conexión y contacta con el administrador.");
+  }
 }
