@@ -287,9 +287,6 @@ void MakerRFID::initializeDBConnection(char* buffer) {
   PGconnection conn(&client, 0, 1024, buffer);
 
   IPAddress PGIP(10,159,5,105);
-  const char ssid[] = "network_ssid";      //  your network SSID (name)
-  const char pass[] = "network_pass";      // your network password
-
   const char user[] = "db_username";       // your database user
   const char password[] = "db_password";   // your database password
   const char dbname[] = "db_name";

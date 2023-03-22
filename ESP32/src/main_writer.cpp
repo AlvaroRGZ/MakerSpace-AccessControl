@@ -38,24 +38,31 @@ byte buffer[34];
 // Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
-    char* ssid = (char*)'A';
-    char* password = (char*)';';
+    String ssid = "Phoenix";
+    String password = "aizc3525";
 
-    // makerspace.StartDisplay();
-    // makerspace.ShowLogos();
+    makerspace.StartDisplay();
+    makerspace.ShowLogos();
     
     pinMode(greenPin, OUTPUT);
     pinMode(redPin, OUTPUT);
-    pinMode(relayPin, OUTPUT);
-    digitalWrite(greenPin, LOW);
-    digitalWrite(redPin, LOW);
-    digitalWrite(relayPin, LOW);
+    pinMode(relay1Pin, OUTPUT);
+    pinMode(relay2Pin, OUTPUT);
+    pinMode(relay3Pin, OUTPUT);
+    pinMode(boozerPin, OUTPUT);
+    digitalWrite(boozerPin, HIGH);
+    // digitalWrite(greenPin, LOW);
+    // digitalWrite(redPin, LOW);
+    // digitalWrite(relayPin, LOW);
 
     makerspace.StartSerial();
     makerspace.StartSPI();
-    // makerspace.SetWiFi(ssid, password);
+    makerspace.StartRFID();
+    makerspace.StartDisplay();
+    makerspace.ShowLogos();
     makerspace.StartWiFi(ssid, password);
-    makerspace.SetKey(alternative_key);
+    makerspace.SetKey(default_key);
+    // Conectar con teclado
 }
 
 void loop() {
