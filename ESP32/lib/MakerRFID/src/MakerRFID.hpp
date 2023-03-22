@@ -9,27 +9,50 @@
 #include <HTTPClient.h>
 #include "logos.h"
 #include <Keypad.h>
-#include <LiquidCrystal_I2C.h>
+
+#include <Wire.h>
+#include <hd44780.h>
+#include <hd44780ioClass/hd44780_I2Cexp.h>
+
+#include <SimplePgSQL.h>
 
 #define SCREEN_ADDRESS 0x3F
 
 // No tocar el 0 y el 1
-#define SS_PIN          27
-#define RST_PIN         26
+#define SS_PIN          26
+#define RST_PIN         27
 #define SIZE_BUFFER     18
 #define MAX_SIZE_BLOCK  16
 #define greenPin        12
 #define redPin          32
 #define relayPin        33
+#define greenLED        14
 #define PERM            "ARM1"
 #define randomSeedPin   
+
+/**
+ * (Relés son interruptores)
+ * RELÉ1 -> D33
+ * RELÉ2 -> D25
+ * RELÉ3 -> D13
+ * BUZZER -> D12
+ * PANTALLA -> D22, D21
+ * LED R -> D32
+ * LED V -> D14
+ */
+
+/**
+ * D15, D2, D4, RX2, TX2, D5
+ * 
+ * D12, D14 (SOLAPAMIENTO)
+ */
 
 class MakerRFID {
   public:
     MakerRFID();
 
     // ####### GETTERS #######
-    LiquidCrystal_I2C GetDisplay();
+    hd44780_I2Cexp GetDisplay();
     MFRC522 GetRFID();
 
     // ####### SET UP #######
@@ -71,11 +94,14 @@ class MakerRFID {
     void setKey(byte* buffer);
     byte* generatePassword();
     void writePassword(byte* password, uint8_t block);
+    void initializeDBConnection(char* buffer);
     void sendPacket(std::string serverAddress, byte* password);
     
   private:
-    LiquidCrystal_I2C display_;
+    hd44780_I2Cexp display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
+    
+    PGconnection connection_;
     // char* ssid_;
     // char* password_;
     MFRC522::MIFARE_Key key_;

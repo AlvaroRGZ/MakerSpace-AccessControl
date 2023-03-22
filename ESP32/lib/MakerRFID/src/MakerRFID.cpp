@@ -1,10 +1,10 @@
 #include "MakerRFID.hpp"
 
-MakerRFID::MakerRFID() : display_(SCREEN_ADDRESS) {
+MakerRFID::MakerRFID() {
   rfid_ = MFRC522(SS_PIN, RST_PIN);
 }
 
-LiquidCrystal_I2C MakerRFID::GetDisplay() {
+hd44780_I2Cexp MakerRFID::GetDisplay() {
   return display_;
 }
 
@@ -77,7 +77,14 @@ bool MakerRFID::validateCard(void) {
 }
 
 void MakerRFID::StartDisplay() {
-  display_.begin(20, 4);
+  Serial.println("Start display() called.");
+  int status = display_.begin(20, 4);
+  if (status) {
+		hd44780::fatalError(status);
+    Serial.println("La pantalla tiene un problema.");
+  } else {
+    Serial.println("La pantalla funciona bien.");
+  }
 }
 
 void MakerRFID::ShowLogos(int delay_time) {
@@ -96,13 +103,11 @@ void MakerRFID::ShowLogos(int delay_time) {
 
 void MakerRFID::DetectCard() {
   while (!rfid_.PICC_IsNewCardPresent()) {
-    Serial.println("No se detecta tarjeta");
+    Serial.println("No se ha detectado la tarjeta.");
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
-    display_.clear();
-    display_.home();
     display_.print("Acerca la tarjeta.");
-    delay(1000);
+    delay(2000);
   }
 
   while (!rfid_.PICC_ReadCardSerial()) {}
@@ -214,7 +219,7 @@ String MakerRFID::compareData(byte* buffer) {
     Serial.print("Nombre de usuario: "); 
     Serial.println(output);
   } else {
-    display_.println("[ERROR] Server request failed. Aborting...");
+    display_.print("[ERROR] Server request failed. Aborting...");
   }
   
   // Si no se recibe nada devuelve una cadena vacia
@@ -275,6 +280,21 @@ void MakerRFID::writePassword(byte* password, uint8_t block) {
   }
 }
 
+void MakerRFID::initializeDBConnection(char* buffer) {
+  WiFiClient client;
+  PGconnection conn(&client, 0, 1024, buffer);
+
+  IPAddress PGIP(10,159,5,105);
+  const char ssid[] = "network_ssid";      //  your network SSID (name)
+  const char pass[] = "network_pass";      // your network password
+
+  const char user[] = "db_username";       // your database user
+  const char password[] = "db_password";   // your database password
+  const char dbname[] = "db_name";
+  connection_.setDbLogin(PGIP, user, password, dbname, "utf8");
+
+}
+
 void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   // std::string serverName = "http://127.0.0.1/getdata.php?";
   std::string uid = "uid=";
@@ -288,13 +308,14 @@ void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
 
   std::string request = serverAddress + uid + "&" + password;
 
-  String output;
-  HTTPClient http;
-  http.begin(request.c_str());
-  int httpCode = http.GET();
-  if(httpCode > 0) {
-    Serial.println("¡Subida al servidor correcta!");
-  } else {
-    Serial.println("Error en la subida, comprueba la conexión y contacta con el administrador.");
-  }
+  // 
+  // String output;
+  // HTTPClient http;
+  // http.begin(request.c_str());
+  // int httpCode = http.GET();
+  // if(httpCode > 0) {
+  //   Serial.println("¡Subida al servidor correcta!");
+  // } else {
+  //   Serial.println("Error en la subida, comprueba la conexión y contacta con el administrador.");
+  // }
 }

@@ -131,7 +131,7 @@ void loop() {
   if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI
     &&  piccType != MFRC522::PICC_TYPE_MIFARE_1K
     &&  piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
-    //Serial.println(F("Tarjeta no compatible :("));
+    // Serial.println(F("Tarjeta no compatible :("));
     return;
   }
 
