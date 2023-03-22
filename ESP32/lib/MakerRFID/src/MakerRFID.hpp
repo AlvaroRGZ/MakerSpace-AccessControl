@@ -60,6 +60,7 @@ class MakerRFID {
     void AuthenticateCard(int = 0);
     bool validateCard();
     void DetectCard();
+    void DetectCard(String waitingMessage);
     void ReadSector(byte*, int blockAddr);
     void ReadSectors(byte*, int, int);
     void ReadAllSectors(byte*, int = 16);
@@ -85,10 +86,11 @@ class MakerRFID {
     void openLocker();
 
     void setKey(byte* buffer);
-    byte* generatePassword();
+    void generatePassword(byte* password);
     void writePassword(byte* password, uint8_t block);
-    void sendPacket(std::string serverAddress, byte* password);
-    
+    String sendPacket(std::string serverAddress, byte* password);
+    String entryRequest(byte* password);
+    String registerNewCard(byte* passwordBuffer);
   private:
     LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid

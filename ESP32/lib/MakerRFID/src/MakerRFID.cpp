@@ -115,6 +115,20 @@ void MakerRFID::DetectCard() {
   while (!rfid_.PICC_ReadCardSerial()) {}
 }
 
+void MakerRFID::DetectCard(String waitingMessage) {
+  while (!rfid_.PICC_IsNewCardPresent()) {
+    Serial.println(waitingMessage);
+    digitalWrite(greenPin, LOW);
+    digitalWrite(redPin, LOW);
+    display_.clear();
+    display_.home();
+    display_.print(waitingMessage);
+    delay(1000);
+  }
+
+  while (!rfid_.PICC_ReadCardSerial()) {}
+}
+
 void MakerRFID::ReadingMessage() {
   display_.clear();
   display_.print("Leyendo...");
@@ -264,14 +278,14 @@ void MakerRFID::setKey(byte* buffer) {
   }
 }
 
-byte* MakerRFID::generatePassword() {
-  byte password[16];
+void MakerRFID::generatePassword(byte* password) {
+  // byte password[16];
   for (uint8_t i = 0; i < 16; ++i) {
     // TODO: true random
     password[i] = byte(random(0, 255));
   }
   Serial.println("Generada nueva contraseña aleatoria.");
-  return password;
+  // return password;
 }
 
 void MakerRFID::writePassword(byte* password, uint8_t block) {
@@ -284,7 +298,7 @@ void MakerRFID::writePassword(byte* password, uint8_t block) {
   }
 }
 
-void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
+String MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   // std::string serverName = "http://127.0.0.1/getdata.php?";
   String uid = "uid=";
   for (uint8_t i = 0; i < rfid_.uid.size; i++) {
@@ -300,31 +314,66 @@ void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   //memcpy(passData, buffer, 16);
   String password = "psswd=passx";//String((char*)passwordBuffer);
   for (uint8_t i = 0; i < 16; i++) {
-    uid += String(passwordBuffer[i], HEX);
+    password += String(passwordBuffer[i], HEX);
   }
   // LOCKER
   String locker = "locker=" + String(locker_);
   // COMBINE REQUEST
   // String request = serverName + user + "&" + password + "&" + locker;
-  String request = "http://10.42.0.1:8080/paginas/reply_comparation.php?";//serverAddress + uid + "&" + password;
+  String request = "http://10.42.0.1:8080/paginas/armario_reply.php?";//serverAddress + uid + "&" + password;
   request += uid;
   request += "&";
   request += password;
   request += "&";
   request += locker;
 
-    Serial.println(request);
+  Serial.println(request);
   String output;
   HTTPClient http;
   http.begin(request.c_str());
   int httpCode = http.GET();
   if(httpCode > 0) {
+    String payload = http.getString();
+    output = payload.substring(payload.indexOf("%") + 1, payload.lastIndexOf("%"));
     Serial.print("Bienvenido ");
-    Serial.println(http.getString());
+    Serial.println(output);
 
   } else {
     Serial.println("Error en la subida, comprueba la conexión y contacta con el administrador.");
   }
+  return output;
+}
+
+String MakerRFID::registerNewCard(byte* passwordBuffer) {
+  String uid = "uid=";
+  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
+    uid += String(rfid_.uid.uidByte[i], HEX);
+  }
+  // PASSWORD
+  String password = "psswd=";
+  for (uint8_t i = 0; i < 16; i++) {
+    password += String(passwordBuffer[i], HEX);
+  }
+  // COMBINE REQUEST
+  // String request = serverName + user + "&" + password + "&" + locker;
+  String request = "http://10.42.0.1:8080/paginas/adduser_reply.php?";
+  request += uid;
+  request += "&";
+  request += password;
+
+  Serial.println(request);
+  String output;
+  HTTPClient http;
+  http.begin(request.c_str());
+  int httpCode = http.GET();
+  if(httpCode > 0) {
+    Serial.print("Registrado");
+    output = http.getString();
+  } else {
+    Serial.print("Ya se ha registrado la tarjeta con ");
+    Serial.println(uid);
+  }
+  return output;
 }
 
 void MakerRFID::connectDB(void) { // Se supone inicializado en el setup tras startWifi()
@@ -346,6 +395,39 @@ void MakerRFID::connectDB(void) { // Se supone inicializado en el setup tras sta
     Serial.println(conn_->status());
   } else {
     Serial.println("Conexión a la base de datos establecida.");
+  }
+}
+
+String MakerRFID::entryRequest(byte* passwordBuffer) {
+  String uid = "uid=";
+  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
+    uid += String(rfid_.uid.uidByte[i], HEX);
+  }
+  // PASSWORD
+  String password = "psswd=passx";
+  for (uint8_t i = 0; i < 16; i++) {
+    password += String(passwordBuffer[i], HEX);
+  }
+  // LOCKER
+  String locker = "locker=" + String(locker_);
+  // COMBINE REQUEST
+  // String request = serverName + user + "&" + password + "&" + locker;
+  String request = "http://10.42.0.1:8080/paginas/entrada_reply.php?";
+  request += uid;
+  request += "&";
+  request += password;
+
+  Serial.println(request);
+  String output;
+  HTTPClient http;
+  http.begin(request.c_str());
+  int httpCode = http.GET();
+  if(httpCode > 0) {
+    Serial.print("Pasa y disfruta ");
+    Serial.println(http.getString());
+  } else {
+    Serial.print("Acceso denegado");
+    Serial.println(uid);
   }
 }
 
