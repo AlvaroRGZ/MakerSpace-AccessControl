@@ -55,7 +55,7 @@ void setup() {
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
     Serial.println("ANTES DE CONNECT");
-    makerspace.connectDB();
+    // makerspace.connectDB();
     Serial.println("FUEEEEEEEEEEEEEEEEERA");
     // Conectar con teclado
 }
@@ -79,7 +79,8 @@ void loop() {
   // makerspace.readLockerFromKeyboard(keypad);
   
   // Llamada al server con los datos de la tarjeta
-  if (makerspace.compareData(buffer) != "") {
+  makerspace.sendPacket("f", buffer);
+  if ((char*)(buffer) != "") {
     makerspace.PermissionMessage(true);
   } else {
     makerspace.PermissionMessage(false);

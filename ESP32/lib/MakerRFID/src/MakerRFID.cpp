@@ -1,7 +1,7 @@
 #include "MakerRFID.hpp"
 
 MakerRFID::MakerRFID(): display_(SCREEN_ADDRESS) {
-  conn_ = nullptr;
+  conn_ = NULL;
   rfid_ = MFRC522(SS_PIN, RST_PIN);
 }
 MakerRFID::~MakerRFID() {
@@ -286,16 +286,29 @@ void MakerRFID::writePassword(byte* password, uint8_t block) {
 
 void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   // std::string serverName = "http://127.0.0.1/getdata.php?";
-  std::string uid = "uid=";
-  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
-    uid += std::string(rfid_.uid.uidByte[i], sizeof(rfid_.uid.uidByte[i]));
-  }
-  
-  char* passData;
-  memcpy(passData, passwordBuffer, sizeof(passwordBuffer));
-  std::string password = "psswd=" + std::string(passData);
-
-  std::string request = serverAddress + uid + "&" + password;
+  String uid = "uid=67 FF KK 43";
+  /*for (uint8_t i = 0; i < rfid_.uid.size; i++) {
+    uid += String(rfid_.uid.uidByte[i], sizeof(rfid_.uid.uidByte[i]));
+  }*/
+  // 
+  // char* passData;
+  // memcpy(passData, passwordBuffer, sizeof(passwordBuffer));
+  // std::string password = "psswd=" + std::string(passData);
+// 
+  // PASSWORD
+  //char* passData;
+  //memcpy(passData, buffer, 16);
+  String password = "psswd=" + String((char*)passwordBuffer);
+  // LOCKER
+  String locker = "locker=" + String(locker_);
+  // COMBINE REQUEST
+  // String request = serverName + user + "&" + password + "&" + locker;
+  String request = "http://10.42.0.1:8080/paginas/reply_comparation.php?";//serverAddress + uid + "&" + password;
+  request += uid;
+  request + "&";
+  request += password;
+  request + "&";
+  request += locker;
 
   String output;
   HTTPClient http;
@@ -308,17 +321,19 @@ void MakerRFID::sendPacket(std::string serverAddress, byte* passwordBuffer) {
   }
 }
 
-void MakerRFID::connectDB(void) {
-  WiFiClient client; // Se supone inicializado en el setup tras startWifi()
-    Serial.println("voy a con");
-    delay(1000);
-  conn_ = new PGconnection(&client, 0, 1024, dbBuffer_);
-    delay(1000);
-    Serial.println("hice con");
-    delay(1000);
+void MakerRFID::connectDB(void) { // Se supone inicializado en el setup tras startWifi()
+  Serial.println("voy a con");
+  delay(1000);
+  conn_ = new PGconnection(&client_, 0, 1024, dbBuffer_);
+  if (conn_ == NULL) {
+    Serial.println("conn_ is a nullptr");
+  }
+  delay(1000);
+  Serial.println("hice con");
+  delay(1000);
   IPAddress PGIP(10,159,5,105); // IP del servidor de la base de datos
 
-  conn_->setDbLogin(PGIP, "postgres", "postgres", "makerspacecontrol", "utf8");
+  conn_->setDbLogin(PGIP, "postgres", "postgres", "makerspacecontrol", "utf8", 5432);
   if (conn_->status() == CONNECTION_BAD) {
     Serial.println("setDbLogin() failed");
     Serial.print("CODE: ");
