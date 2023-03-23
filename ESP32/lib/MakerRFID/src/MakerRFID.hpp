@@ -9,6 +9,7 @@
 #include <HTTPClient.h>
 #include "logos.h"
 #include <Keypad.h>
+#include <U8x8lib.h>
 #include <LiquidCrystal_I2C.h>
 
 
@@ -82,6 +83,7 @@ class MakerRFID {
 
     // ####### Relés #######
     void PermissionMessage(bool);
+    void displayMessage(String message);
     void readLockerFromKeyboard(Keypad &keypad);
     void openLocker();
 
@@ -90,7 +92,10 @@ class MakerRFID {
     void writePassword(byte* password, uint8_t block);
     String sendPacket(std::string serverAddress, byte* password);
     String entryRequest(byte* password);
+    bool doesUserExist();
     String registerNewCard(byte* passwordBuffer);
+
+    String processHttpResponse(String res); 
   private:
     LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid

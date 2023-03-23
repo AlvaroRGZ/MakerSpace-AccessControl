@@ -32,7 +32,7 @@ byte colPins[COLS] = {KEYBOARD_C1_PIN, KEYBOARD_C2_PIN, KEYBOARD_C3_PIN,
 Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
-    String ssid = "makerspace-controlserver";
+    String ssid = "meik";//"makerspace-controlserver";
     String password = "meikspeis";
 
     makerspace.StartDisplay();
