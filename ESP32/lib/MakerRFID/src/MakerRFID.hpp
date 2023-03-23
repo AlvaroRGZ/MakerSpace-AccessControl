@@ -80,7 +80,6 @@ class MakerRFID {
     // ####### Display information #######
     void ReadingMessage();
     void PrintCardDetails();
-    void printScreen(String msg);
 
     // ####### Relés #######
     void PermissionMessage(bool);
@@ -98,8 +97,7 @@ class MakerRFID {
 
     String processHttpResponse(String res); 
   private:
-    // LiquidCrystal_I2C display_; // Deprecated
-    U8X8_SSD1306_128X32_UNIVISION_HW_I2C screen_;
+    LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
     // char* ssid_;
     // char* password_;

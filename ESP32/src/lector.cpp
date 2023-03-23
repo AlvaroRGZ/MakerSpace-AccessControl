@@ -30,9 +30,6 @@ void setup() {
     makerspace.StartRFID();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
-    Serial.println("ANTES DE CONNECT");
-    // makerspace.connectDB();
-    Serial.println("FUEEEEEEEEEEEEEEEEERA");
     // Conectar con teclado
 }
 
@@ -41,20 +38,21 @@ void loop() {
   byte buffer[32];
   // makerspace.waitForKeyboard();
   // makerspace.displayRequest();
-  makerspace.DetectCard();
-  makerspace.ReadingMessage();
+  //makerspace.DetectCard();
+  //makerspace.ReadingMessage();
   //digitalWrite(greenPin, HIGH);
-  makerspace.PrintCardDetails();
+  //makerspace.PrintCardDetails();
 
-  makerspace.validateCard();
+  //makerspace.validateCard();
 
-  makerspace.AuthenticateCard();
+  //makerspace.AuthenticateCard();
 
-  makerspace.ReadSector(buffer, dataBlock);
+  //makerspace.ReadSector(buffer, dataBlock);
   // digitalWrite(greenPin, LOW);
   // makerspace.readLockerFromKeyboard(keypad);
   
   // Llamada al server con los datos de la tarjeta
+  /*
   if (makerspace.entryRequest(buffer) == "") {
     makerspace.PermissionMessage(true);
     digitalWrite(greenPin, HIGH);
@@ -65,6 +63,6 @@ void loop() {
     digitalWrite(redPin, HIGH);
     delay(1000);
   }
-  
+  */
   makerspace.StopRFID();
 }

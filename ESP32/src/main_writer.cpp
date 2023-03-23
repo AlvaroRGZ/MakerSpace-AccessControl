@@ -12,7 +12,7 @@ MakerRFID makerspace;
 byte default_key[16] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x07, 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 byte alternative_key[16] = {0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E, 0xFF, 0x07, 0x80, 0x69, 0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E};
 byte buffer[34];
-// U8X8_SSD1306_128X32_UNIVISION_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);   // Adafruit ESP8266/32u4/ARM Boards + FeatherWing OLED
+U8X8_SSD1306_128X32_UNIVISION_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);   // Adafruit ESP8266/32u4/ARM Boards + FeatherWing OLED
 
 void setup() {
     String ssid = "makerspace-controlserver";
@@ -37,6 +37,7 @@ void setup() {
     makerspace.StartRFID();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
+    u8x8.begin(); // Arduboy 10 (Produ
 }
 
 void loop() {
@@ -44,10 +45,10 @@ void loop() {
   // makerspace.waitForKeyboard();
   // makerspace.displayRequest();
   makerspace.DetectCard();
-  // makerspace.ReadingMessage();
+  makerspace.ReadingMessage();
   digitalWrite(greenPin, HIGH);
   digitalWrite(redPin, HIGH);
-  // makerspace.PrintCardDetails();
+  makerspace.PrintCardDetails();
 
   makerspace.validateCard();
 
@@ -55,12 +56,15 @@ void loop() {
 
   byte newPassword[16];
 
-  if (!makerspace.doesUserExist()) {
-    // makerspace.displayMessage("No existe ese usuario, creando nuevo");
-    makerspace.printScreen("No existe ese usuario, creando nuevo");
+  if (makerspace.doesUserExist()) {
+    makerspace.displayMessage("Ya esiste ese usuario");
+     u8x8.setFont(u8x8_font_chroma48medium8_r);
+    String d = "Hellafghrehrehnrehrhrh";
+    u8x8.drawString(0,0,d.c_str());
+    u8x8.refreshDisplay();		// only required for SSD1606/7  
+    delay(2000);
   } else {
-    // makerspace.displayMessage("Ya esiste ese usuario");
-    makerspace.printScreen("No existe ese usuario, creando nuevo");
+    makerspace.displayMessage("No existe ese usuario");
   }
   
 
