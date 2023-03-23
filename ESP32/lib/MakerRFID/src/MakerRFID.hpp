@@ -97,7 +97,7 @@ class MakerRFID {
 
     String processHttpResponse(String res); 
   private:
-    LiquidCrystal_I2C display_;
+    // LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
     // char* ssid_;
     // char* password_;

@@ -1,6 +1,6 @@
 #include "MakerRFID.hpp"
 
-MakerRFID::MakerRFID(): display_(SCREEN_ADDRESS) {
+MakerRFID::MakerRFID() {// : display_(SCREEN_ADDRESS) {
   conn_ = NULL;
   rfid_ = MFRC522(SS_PIN, RST_PIN);
 }
@@ -11,7 +11,7 @@ MakerRFID::~MakerRFID() {
 }
 
 LiquidCrystal_I2C MakerRFID::GetDisplay() {
-  return display_;
+  // return display_;
 }
 
 MFRC522 MakerRFID::GetRFID() {
@@ -84,7 +84,7 @@ bool MakerRFID::validateCard(void) {
 }
 
 void MakerRFID::StartDisplay() {
-  display_.begin(20, 4);
+  // display_.begin(20, 4);
 }
 
 void MakerRFID::ShowLogos(int delay_time) {
@@ -107,9 +107,9 @@ void MakerRFID::DetectCard() {
     Serial.print(".");
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
-    display_.clear();
-    display_.home();
-    display_.print("Acerca la tarjeta.");
+    // display_.clear();
+    // display_.home();
+    // display_.print("Acerca la tarjeta.");
     delay(1000);
   }
 
@@ -121,9 +121,9 @@ void MakerRFID::DetectCard(String waitingMessage) {
     Serial.println(waitingMessage);
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
-    display_.clear();
-    display_.home();
-    display_.print(waitingMessage);
+    // display_.clear();
+    // display_.home();
+    // display_.print(waitingMessage);
     delay(1000);
   }
 
@@ -131,8 +131,8 @@ void MakerRFID::DetectCard(String waitingMessage) {
 }
 
 void MakerRFID::ReadingMessage() {
-  display_.clear();
-  display_.print("Leyendo...");
+  // display_.clear();
+  // display_.print("Leyendo...");
   Serial.println("Tarjeta detectada.");
 }
 
@@ -194,11 +194,11 @@ void MakerRFID::ReadAllSectors(byte* buffer, int max_sectors) {
 // Deberiamos poder determinar que rele abrir
 void MakerRFID::PermissionMessage(bool has_permission) {
   if (has_permission) {
-    display_.clear();
-    display_.print("Permiso concedido.");
+    // display_.clear();
+    // display_.print("Permiso concedido.");
   } else {
-    display_.clear();
-    display_.print("Permisos insuficientes.");
+    // display_.clear();
+    // display_.print("Permisos insuficientes.");
   }
 }
 
@@ -244,7 +244,7 @@ String MakerRFID::compareData(byte* buffer) {
     Serial.print("Nombre de usuario: "); 
     Serial.println(output);
   } else {
-    display_.println("[ERROR] Server request failed. Aborting...");
+    // display_.println("[ERROR] Server request failed. Aborting...");
   }
   
   // Si no se recibe nada devuelve una cadena vacia
