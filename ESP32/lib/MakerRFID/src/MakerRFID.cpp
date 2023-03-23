@@ -1,6 +1,6 @@
 #include "MakerRFID.hpp"
 
-MakerRFID::MakerRFID(): display_(SCREEN_ADDRESS) {
+MakerRFID::MakerRFID() {// : // display_(SCREEN_ADDRESS) {
   conn_ = NULL;
   rfid_ = MFRC522(SS_PIN, RST_PIN);
 }
@@ -10,9 +10,9 @@ MakerRFID::~MakerRFID() {
   }
 }
 
-LiquidCrystal_I2C MakerRFID::GetDisplay() {
-  return display_;
-}
+//LiquidCrystal_I2C MakerRFID::GetDisplay() {
+//  return // display_;
+//}
 
 MFRC522 MakerRFID::GetRFID() {
   return rfid_;
@@ -84,21 +84,21 @@ bool MakerRFID::validateCard(void) {
 }
 
 void MakerRFID::StartDisplay() {
-  display_.begin(20, 4);
+  // display_.begin(20, 4);
 }
 
 void MakerRFID::ShowLogos(int delay_time) {
   // This no longer uses Adafruit so a drawBitmap substitute is needed
   //
-  // display_.clearDisplay();
-  // display_.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
-  // display_.display();
+  // // display_.clearDisplay();
+  // // display_.drawBitmap(0, 0, logoCepsa, 120, 32, 1);
+  // // display_.display();
   // delay(delay_time); // Pause for 2.5 seconds
-  // display_.clearDisplay();
-  // display_.drawBitmap(0, 0, logoULL, 120, 32, 1);
-  // display_.display();
+  // // display_.clearDisplay();
+  // // display_.drawBitmap(0, 0, logoULL, 120, 32, 1);
+  // // display_.display();
   // delay(delay_time); // Pause for 2.5 seconds
-  // display_.clearDisplay();
+  // // display_.clearDisplay();
 }
 
 void MakerRFID::DetectCard() {
@@ -107,9 +107,9 @@ void MakerRFID::DetectCard() {
     Serial.print(".");
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
-    display_.clear();
-    display_.home();
-    display_.print("Acerca la tarjeta.");
+    // display_.clear();
+    // display_.home();
+    // display_.print("Acerca la tarjeta.");
     delay(1000);
   }
 
@@ -121,9 +121,9 @@ void MakerRFID::DetectCard(String waitingMessage) {
     Serial.println(waitingMessage);
     digitalWrite(greenPin, LOW);
     digitalWrite(redPin, LOW);
-    display_.clear();
-    display_.home();
-    display_.print(waitingMessage);
+    // display_.clear();
+    // display_.home();
+    // display_.print(waitingMessage);
     delay(1000);
   }
 
@@ -131,8 +131,8 @@ void MakerRFID::DetectCard(String waitingMessage) {
 }
 
 void MakerRFID::ReadingMessage() {
-  display_.clear();
-  display_.print("Leyendo...");
+  // display_.clear();
+  // display_.print("Leyendo...");
   Serial.println("Tarjeta detectada.");
 }
 
@@ -194,19 +194,19 @@ void MakerRFID::ReadAllSectors(byte* buffer, int max_sectors) {
 // Deberiamos poder determinar que rele abrir
 void MakerRFID::PermissionMessage(bool has_permission) {
   if (has_permission) {
-    display_.clear();
-    display_.print("Permiso concedido.");
+    // display_.clear();
+    // display_.print("Permiso concedido.");
   } else {
-    display_.clear();
-    display_.print("Permisos insuficientes.");
+    // display_.clear();
+    // display_.print("Permisos insuficientes.");
   }
 }
 
 // Muestra la informacion por el display y acciona el relé
 // Deberiamos poder determinar que rele abrir
 void MakerRFID::displayMessage(String msg) {
-  // display_.clear();
-  // display_.print("Permisos insuficientes.");
+  // // display_.clear();
+  // // display_.print("Permisos insuficientes.");
   Serial.println(msg);
 }
 
@@ -244,7 +244,7 @@ String MakerRFID::compareData(byte* buffer) {
     Serial.print("Nombre de usuario: "); 
     Serial.println(output);
   } else {
-    display_.println("[ERROR] Server request failed. Aborting...");
+    // display_.println("[ERROR] Server request failed. Aborting...");
   }
   
   // Si no se recibe nada devuelve una cadena vacia
@@ -390,12 +390,12 @@ bool MakerRFID::doesUserExist() {
   }
   String request = "http://10.42.0.1:8080/paginas/check_new_user.php?";//serverAddress + uid + "&" + password;
   request += uid;
-  Serial.println(request);
+  // Serial.println(request);
   HTTPClient http;
   http.begin(request.c_str());
   int httpCode = http.GET();
   String response = processHttpResponse(http.getString());
-  if(httpCode > 0 && response == "") {
+  if(httpCode > 0 && (response == "-1" || response == "")) {
     Serial.println("[checkNewUser == 0]");
     Serial.print(response);
     return false;
@@ -404,7 +404,7 @@ bool MakerRFID::doesUserExist() {
     Serial.print("contenido = ");
     Serial.println(response);
     delay(1000);
-    return true;  
+    return true;
   }
 }
 
@@ -443,4 +443,8 @@ String MakerRFID::entryRequest(byte* passwordBuffer) {
 
 String MakerRFID::processHttpResponse(String res) {
   return res.substring(res.indexOf("%") + 1, res.lastIndexOf("%"));
+}
+
+void MakerRFID::printScreen(String msg) {
+  screen_.drawString(0,0,msg.c_str());
 }
