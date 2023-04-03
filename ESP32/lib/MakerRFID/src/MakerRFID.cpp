@@ -212,47 +212,6 @@ void MakerRFID::displayMessage(String msg) {
   Serial.println(msg);
 }
 
-// Comunication with server
-// send uid, password and locker to server for it to check if valid.
-String MakerRFID::compareData(byte* buffer) {
-  String serverName = "http://192.168.241.15:8080/paginas/reply_comparation.php?";
-  // UID
-  String uidString;
-  for (uint8_t i = 0; i < rfid_.uid.size; i++) {
-    uidString += String(rfid_.uid.uidByte[i], HEX);// std::string(rfid_.uid.uidByte[i], sizeof(rfid_.uid.uidByte[i]));
-  }
-  String user = "uid=" + uidString;
-  // for (uint8_t i = 0; i < sizeof(buffer); i++) {
-  //   pass += std::string(buffer[i], sizeof(buffer[i]));
-  // }
-  // PASSWORD
-  //char* passData;
-  //memcpy(passData, buffer, 16);
-  String password = "psswd=" + String((char*)buffer);
-  // LOCKER
-  String locker = "locker=" + String(locker_);
-  // COMBINE REQUEST
-  String request = serverName + user + "&" + password + "&" + locker;
-  // char* request = new char[Srequest.length() + 1];
-  // strcpy(request, Srequest.c_str());
-
-  // QUERY
-  String output;
-  HTTPClient http;
-  http.begin(request.c_str());
-  int httpCode = http.GET();
-  if(httpCode > 0){
-    output = http.getString();
-    Serial.print("Nombre de usuario: "); 
-    Serial.println(output);
-  } else {
-    // display_.println("[ERROR] Server request failed. Aborting...");
-  }
-  
-  // Si no se recibe nada devuelve una cadena vacia
-  return output;
-}
-
 void MakerRFID::readLockerFromKeyboard(Keypad &keypad) {
   // char pressedKey = keypad.waitForKey();
   locker_ = 1;// uint8_t(pressedKey);

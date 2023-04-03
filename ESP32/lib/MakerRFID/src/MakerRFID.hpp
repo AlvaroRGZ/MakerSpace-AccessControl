@@ -59,7 +59,7 @@ class MakerRFID {
     ~MakerRFID();
 
     // ####### GETTERS #######
-    hd44780_I2Cexp GetDisplay();
+    LiquidCrystal_I2C GetDisplay();
     MFRC522 GetRFID();
 
     // ####### SET UP #######
@@ -91,7 +91,6 @@ class MakerRFID {
     String compareData(byte* buffer);
 
     // ####### DB operations #######
-
     void connectDB(void);
     String executeQuery(byte* Buffer);
 
@@ -115,18 +114,18 @@ class MakerRFID {
 
     String processHttpResponse(String res); 
   private:
-    // LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
-    
-    // char* ssid_;
-    // char* password_;
     MFRC522::MIFARE_Key key_;
     MFRC522::StatusCode status_;
+
+    LiquidCrystal_I2C display_;
+    
     uint8_t locker_;
+
     PGconnection* conn_;
     char dbBuffer_[1024]; // Internal buffer for ddb connection
-    WiFiClient client_;
-};  
+    WiFiClient client_; // necessary for PGconnection constructor.
+};
 
 
 #endif

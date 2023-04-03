@@ -1,5 +1,13 @@
-//Salvador Pérez del Pino
-//Programa para escribir los datos de usuario en el ESP32
+/*
+ * Salvador Pérez del Pino
+ *
+ * Revised by:
+ * Álvaro Rodríguez Gómez 
+ * Áram Pérez Dios
+ * Marcos Barrios Lorenzo
+ * 
+ * ESP32 Card writer
+ */
 #include <Arduino.h>
 #include <WiFi.h>
 #include <SPI.h>

@@ -1,5 +1,13 @@
-// Salvador Pérez del Pino
-// ESP32 Debugger
+/*
+ * Salvador Pérez del Pino
+ *
+ * Revised by:
+ * Álvaro Rodríguez Gómez 
+ * Áram Pérez Dios
+ * Marcos Barrios Lorenzo
+ * 
+ * ESP32 Card reader
+ */
 #include <MakerRFID.hpp>
 
 MakerRFID makerspace;
@@ -34,25 +42,22 @@ void setup() {
 }
 
 void loop() {
-  
   byte buffer[32];
   // makerspace.waitForKeyboard();
   // makerspace.displayRequest();
-  //makerspace.DetectCard();
-  //makerspace.ReadingMessage();
-  //digitalWrite(greenPin, HIGH);
-  //makerspace.PrintCardDetails();
+  makerspace.DetectCard();
+  makerspace.ReadingMessage();
+  digitalWrite(greenPin, HIGH); // turn on green LED
+  makerspace.PrintCardDetails();
 
-  //makerspace.validateCard();
+  makerspace.validateCard();
+  makerspace.AuthenticateCard();
 
-  //makerspace.AuthenticateCard();
-
-  //makerspace.ReadSector(buffer, dataBlock);
-  // digitalWrite(greenPin, LOW);
-  // makerspace.readLockerFromKeyboard(keypad);
+  makerspace.ReadSector(buffer, dataBlock);
+  digitalWrite(greenPin, LOW);
+  makerspace.readLockerFromKeyboard(keypad);
   
   // Llamada al server con los datos de la tarjeta
-  /*
   if (makerspace.entryRequest(buffer) == "") {
     makerspace.PermissionMessage(true);
     digitalWrite(greenPin, HIGH);
@@ -60,9 +65,9 @@ void loop() {
     makerspace.openLocker();
   } else {
     makerspace.PermissionMessage(false);
-    digitalWrite(redPin, HIGH);
+    digitalWrite(redPin, HIGH); // turn on red LED
     delay(1000);
   }
-  */
+
   makerspace.StopRFID();
 }

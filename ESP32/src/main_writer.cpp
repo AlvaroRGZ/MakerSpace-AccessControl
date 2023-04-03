@@ -1,5 +1,14 @@
-// Salvador Pérez del Pino
-// ESP32 Debugger
+/*
+ * Salvador Pérez del Pino
+ *
+ * Revised by:
+ * Álvaro Rodríguez Gómez 
+ * Áram Pérez Dios
+ * Marcos Barrios Lorenzo
+ * 
+ * ESP32 Card writer
+ */
+
 #include <MakerRFID.hpp>
 
 const unsigned dataBlock = 10;
