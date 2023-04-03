@@ -12,34 +12,11 @@ MakerRFID makerspace;
 byte default_key[16] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x07, 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 byte alternative_key[16] = {0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E, 0xFF, 0x07, 0x80, 0x69, 0x4D, 0x6F, 0x72, 0x67, 0x61, 0x6E};
 byte buffer[34];
-
-// #define KEYBOARD_R1_PIN 9
-// #define KEYBOARD_R2_PIN 8
-// #define KEYBOARD_R3_PIN 7
-// #define KEYBOARD_R4_PIN 6
-// #define KEYBOARD_C1_PIN 5
-// #define KEYBOARD_C2_PIN 4
-// #define KEYBOARD_C3_PIN 3
-// #define KEYBOARD_C4_PIN 2
-
-// setup keypad
-// const byte ROWS = 4; 
-// const byte COLS = 4; 
-// char hexaKeys[ROWS][COLS] = {
-//   {'1', '2', '3', 'A'},
-//   {'4', '5', '6', 'B'},
-//   {'7', '8', '9', 'C'},
-//   {'*', '0', '#', 'D'}
-// };
-// byte rowPins[ROWS] = {KEYBOARD_R1_PIN, KEYBOARD_R2_PIN, KEYBOARD_R3_PIN,
-//     KEYBOARD_R4_PIN};
-// byte colPins[COLS] = {KEYBOARD_C1_PIN, KEYBOARD_C2_PIN, KEYBOARD_C3_PIN,
-//     KEYBOARD_C4_PIN}; 
-// Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+U8X8_SSD1306_128X32_UNIVISION_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);   // Adafruit ESP8266/32u4/ARM Boards + FeatherWing OLED
 
 void setup() {
-    String ssid = "Phoenix";
-    String password = "aizc3525";
+    String ssid = "makerspace-controlserver";
+    String password = "meikspeis";
 
     makerspace.StartDisplay();
     makerspace.ShowLogos();
@@ -58,11 +35,9 @@ void setup() {
     makerspace.StartSerial();
     makerspace.StartSPI();
     makerspace.StartRFID();
-    makerspace.StartDisplay();
-    makerspace.ShowLogos();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
-    // Conectar con teclado
+    u8x8.begin(); // Arduboy 10 (Produ
 }
 
 void loop() {
@@ -77,13 +52,43 @@ void loop() {
 
   makerspace.validateCard();
 
-  makerspace.setKey(default_key);
   makerspace.AuthenticateCard();
 
-  byte* newPassword = makerspace.generatePassword();
-  makerspace.writePassword(newPassword, dataBlock);
-  makerspace.sendPacket(serverAddress, newPassword);
+  byte newPassword[16];
+
+  if (makerspace.doesUserExist()) {
+    makerspace.displayMessage("Ya esiste ese usuario");
+     u8x8.setFont(u8x8_font_chroma48medium8_r);
+    String d = "Hellafghrehrehnrehrhrh";
+    u8x8.drawString(0,0,d.c_str());
+    u8x8.refreshDisplay();		// only required for SSD1606/7  
+    delay(2000);
+  } else {
+    makerspace.displayMessage("No existe ese usuario");
+  }
   
+
+  /*
+  if (!makerspace.doesUserExist()) {
+    makerspace.generatePassword(newPassword);
+    makerspace.writePassword(newPassword, dataBlock);
+    if ((makerspace.registerNewCard(newPassword)) != "") {
+      // makerspace.PermissionMessage(true);
+      makerspace.displayMessage("Nuevo usuario registrado con exito");
+      digitalWrite(greenPin, HIGH);
+      digitalWrite(boozerPin, LOW);
+      //makerspace.openLocker();
+    } else {
+      makerspace.displayMessage("Se ha detectado duplicacion en la BBDD");
+      digitalWrite(redPin, HIGH);
+      delay(1000);
+    }
+  } else {
+    makerspace.displayMessage("Usuario ya registrado. Abortando");
+    digitalWrite(redPin, HIGH);
+    delay(1000);
+  }
+  */
   makerspace.StopRFID();
 }
 

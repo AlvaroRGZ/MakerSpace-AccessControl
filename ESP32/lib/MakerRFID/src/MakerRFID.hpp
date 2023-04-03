@@ -9,12 +9,8 @@
 #include <HTTPClient.h>
 #include "logos.h"
 #include <Keypad.h>
-
-#include <Wire.h>
-#include <hd44780.h>
-#include <hd44780ioClass/hd44780_I2Cexp.h>
-
-#include <SimplePgSQL.h>
+#include <U8x8lib.h>
+#include <LiquidCrystal_I2C.h>
 
 
 
@@ -83,6 +79,7 @@ class MakerRFID {
     void AuthenticateCard(int = 0);
     bool validateCard();
     void DetectCard();
+    void DetectCard(String waitingMessage);
     void ReadSector(byte*, int blockAddr);
     void ReadSectors(byte*, int, int);
     void ReadAllSectors(byte*, int = 16);
@@ -104,16 +101,21 @@ class MakerRFID {
 
     // ####### Relés #######
     void PermissionMessage(bool);
+    void displayMessage(String message);
     void readLockerFromKeyboard(Keypad &keypad);
     void openLocker();
 
     void setKey(byte* buffer);
-    byte* generatePassword();
+    void generatePassword(byte* password);
     void writePassword(byte* password, uint8_t block);
-    void sendPacket(std::string serverAddress, byte* password);
-    
+    String sendPacket(std::string serverAddress, byte* password);
+    String entryRequest(byte* password);
+    bool doesUserExist();
+    String registerNewCard(byte* passwordBuffer);
+
+    String processHttpResponse(String res); 
   private:
-    hd44780_I2Cexp display_;
+    // LiquidCrystal_I2C display_;
     MFRC522 rfid_; // https://github.com/miguelbalboa/rfid
     
     // char* ssid_;

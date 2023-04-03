@@ -32,7 +32,7 @@ const unsigned dataBlock = 10;
 // Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
-    String ssid = "makerspace-controlserver";
+    String ssid = "meik";//"makerspace-controlserver";
     String password = "meikspeis";
 
     pinMode(greenPin, OUTPUT);
@@ -53,7 +53,6 @@ void setup() {
     makerspace.ShowLogos();
     makerspace.StartWiFi(ssid, password);
     makerspace.SetKey(default_key);
-    //makerspace.connectDB();
     // Conectar con teclado
 }
 
@@ -61,6 +60,8 @@ void loop() {
   byte buffer[32];
   // makerspace.waitForKeyboard();
   // makerspace.displayRequest();
+  digitalWrite(redPin, LOW);
+  digitalWrite(greenPin, LOW);
   makerspace.DetectCard();
   makerspace.ReadingMessage();
   // digitalWrite(greenLED, HIGH);
@@ -76,15 +77,16 @@ void loop() {
   // makerspace.readLockerFromKeyboard(keypad);
   
   // Llamada al server con los datos de la tarjeta
-  // if (makerspace.compareData(buffer) != "") {
-  //   makerspace.PermissionMessage(true);
-  // } else {
-  //   makerspace.PermissionMessage(false);
-  //   digitalWrite(greenPin, HIGH);
-  //   digitalWrite(boozerPin, LOW);
-  //   makerspace.openLocker();
-  //   digitalWrite(greenPin, LOW);
-  // }
+  if ((makerspace.sendPacket("f", buffer)) != "") {
+    makerspace.PermissionMessage(true);
+    digitalWrite(greenPin, HIGH);
+    digitalWrite(boozerPin, LOW);
+    makerspace.openLocker();
+  } else {
+    makerspace.PermissionMessage(false);
+    digitalWrite(redPin, HIGH);
+    delay(1000);
+  }
   
   makerspace.StopRFID();
 }
